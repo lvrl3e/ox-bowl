@@ -18,8 +18,8 @@ export default function AdminHeader({ active }: { active: string }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="border-b border-line pb-4 mb-8">
-      <div className="flex items-center justify-between gap-4">
+    <header className="relative border-b border-line h-16 mb-8 flex items-center">
+      <div className="w-full flex items-center justify-between gap-4">
         <Link
           href="/admin"
           className="flex items-center gap-2 leading-tight shrink-0"
@@ -89,7 +89,7 @@ export default function AdminHeader({ active }: { active: string }) {
       </div>
 
       {open && (
-        <nav className="sm:hidden flex flex-col gap-2 mt-4">
+        <nav className="sm:hidden absolute left-0 right-0 top-full z-40 flex flex-col gap-2 bg-bg border-b border-line shadow-[0_12px_24px_rgba(0,0,0,0.35)] p-4">
           {NAV.map((item) => (
             <Link
               key={item.href}
