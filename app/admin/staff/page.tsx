@@ -14,25 +14,27 @@ export default async function AdminStaffPage() {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) redirect("/admin/login");
 
-  const { data: adminUser } = await supabase
-    .from("admin_users")
-    .select("role")
-    .eq("id", userData.user.id)
-    .single<{ role: AdminRole }>();
-  if (!adminUser) redirect("/admin/login");
-  const isOwner = adminUser.role === "owner";
-
-  const { data: staffRows } = await supabase
-    .from("admin_users")
-    .select("*")
-    .order("created_at", { ascending: true });
-  const staff = (staffRows as AdminUser[] | null) ?? [];
-
   // Supabase Auth emails aren't stored in admin_users, so look them up
   // via the service-role admin API and match by id.
   const adminClient = createAdminClient();
-  const { data: authUsers } = await adminClient.auth.admin.listUsers();
-  const emailById = new Map(authUsers?.users.map((u) => [u.id, u.email]) ?? []);
+
+  const [adminUserResult, staffRowsResult, authUsersResult] = await Promise.all([
+    supabase
+      .from("admin_users")
+      .select("role")
+      .eq("id", userData.user.id)
+      .single<{ role: AdminRole }>(),
+    supabase.from("admin_users").select("*").order("created_at", { ascending: true }),
+    adminClient.auth.admin.listUsers(),
+  ]);
+  const adminUser = adminUserResult.data;
+  if (!adminUser) redirect("/admin/login");
+  const isOwner = adminUser.role === "owner";
+
+  const staff = (staffRowsResult.data as AdminUser[] | null) ?? [];
+  const emailById = new Map(
+    authUsersResult.data?.users.map((u) => [u.id, u.email]) ?? []
+  );
 
   return (
     <div className="min-h-screen px-5 py-10 max-w-[720px] mx-auto">

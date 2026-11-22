@@ -33,16 +33,24 @@ export default async function AdminHomePage() {
     redirect("/admin/login");
   }
 
-  const { data: adminUser } = await supabase
-    .from("admin_users")
-    .select("name, role")
-    .eq("id", userData.user.id)
-    .single<{ name: string | null; role: AdminRole }>();
-
   const todayBounds = manilaDateBounds(manilaDayKey(new Date()));
 
-  const [received, preparing, ready, needsReview, completedToday, settingsResult, recentResult] =
+  const [
+    adminUserResult,
+    received,
+    preparing,
+    ready,
+    needsReview,
+    completedToday,
+    settingsResult,
+    recentResult,
+  ] =
     await Promise.all([
+      supabase
+        .from("admin_users")
+        .select("name, role")
+        .eq("id", userData.user.id)
+        .single<{ name: string | null; role: AdminRole }>(),
       supabase.from("orders").select("*", { count: "exact", head: true }).eq("status", "received"),
       supabase.from("orders").select("*", { count: "exact", head: true }).eq("status", "preparing"),
       supabase.from("orders").select("*", { count: "exact", head: true }).eq("status", "ready"),
@@ -65,6 +73,7 @@ export default async function AdminHomePage() {
         .limit(5),
     ]);
 
+  const adminUser = adminUserResult.data;
   const todaySales = (completedToday.data ?? []).reduce(
     (sum, o: { total: number }) => sum + o.total,
     0

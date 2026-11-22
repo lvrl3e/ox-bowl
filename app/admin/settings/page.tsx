@@ -13,14 +13,16 @@ export default async function AdminSettingsPage() {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) redirect("/admin/login");
 
-  const { data: adminUser } = await supabase
-    .from("admin_users")
-    .select("role")
-    .eq("id", userData.user.id)
-    .single<{ role: AdminRole }>();
+  const [adminUserResult, { settings }] = await Promise.all([
+    supabase
+      .from("admin_users")
+      .select("role")
+      .eq("id", userData.user.id)
+      .single<{ role: AdminRole }>(),
+    getSettings(),
+  ]);
+  const adminUser = adminUserResult.data;
   if (!adminUser) redirect("/admin/login");
-
-  const { settings } = await getSettings();
 
   return (
     <div className="min-h-screen px-5 py-10 max-w-[720px] mx-auto">

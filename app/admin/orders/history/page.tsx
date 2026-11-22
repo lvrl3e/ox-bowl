@@ -42,16 +42,6 @@ export default async function AdminOrdersHistoryPage({
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) redirect("/admin/login");
 
-  // Defense-in-depth: the service-role client below bypasses RLS
-  // entirely to generate screenshot signed URLs, so this page checks
-  // admin_users membership itself rather than relying only on RLS.
-  const { data: adminUser } = await supabase
-    .from("admin_users")
-    .select("role")
-    .eq("id", userData.user.id)
-    .single<{ role: AdminRole }>();
-  if (!adminUser) redirect("/admin/login");
-
   const todayStr = manilaDayKey(new Date());
   const yesterdayStr = manilaDayKey(new Date(Date.now() - 24 * 60 * 60 * 1000));
   const selectedCompletedDate =
@@ -102,7 +92,22 @@ export default async function AdminOrdersHistoryPage({
       .range((selectedCancelledPage - 1) * PAGE_SIZE, selectedCancelledPage * PAGE_SIZE - 1);
   }
 
-  const [completedResult, cancelledResult] = await Promise.all([completedQuery, cancelledQuery]);
+  // Defense-in-depth: the service-role client below bypasses RLS
+  // entirely to generate screenshot signed URLs, so this page checks
+  // admin_users membership itself rather than relying only on RLS. Run
+  // it alongside the order queries (instead of before) since RLS already
+  // gates those on their own — we just discard the results below if the
+  // admin check fails.
+  const [adminUserResult, completedResult, cancelledResult] = await Promise.all([
+    supabase
+      .from("admin_users")
+      .select("role")
+      .eq("id", userData.user.id)
+      .single<{ role: AdminRole }>(),
+    completedQuery,
+    cancelledQuery,
+  ]);
+  if (!adminUserResult.data) redirect("/admin/login");
 
   const error = completedResult.error ?? cancelledResult.error;
   const completedOrders = (completedResult.data as OrderWithItems[] | null) ?? [];

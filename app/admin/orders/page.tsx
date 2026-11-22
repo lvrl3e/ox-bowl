@@ -26,16 +26,6 @@ export default async function AdminOrdersPage({
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) redirect("/admin/login");
 
-  // Defense-in-depth: the service-role client below bypasses RLS
-  // entirely to generate screenshot signed URLs, so this page checks
-  // admin_users membership itself rather than relying only on RLS.
-  const { data: adminUser } = await supabase
-    .from("admin_users")
-    .select("role")
-    .eq("id", userData.user.id)
-    .single<{ role: AdminRole }>();
-  if (!adminUser) redirect("/admin/login");
-
   let query = supabase
     .from("orders")
     .select("*, order_items(*)")
@@ -49,7 +39,21 @@ export default async function AdminOrdersPage({
     query = query.or(`order_number.ilike.%${escaped}%,customer_mobile.ilike.%${escaped}%`);
   }
 
-  const { data, error } = await query;
+  // Defense-in-depth: the service-role client below bypasses RLS
+  // entirely to generate screenshot signed URLs, so this page checks
+  // admin_users membership itself rather than relying only on RLS. Run
+  // it alongside the orders query (instead of before) since RLS already
+  // gates the orders query on its own — we just discard the result
+  // below if the admin check fails.
+  const [adminUserResult, { data, error }] = await Promise.all([
+    supabase
+      .from("admin_users")
+      .select("role")
+      .eq("id", userData.user.id)
+      .single<{ role: AdminRole }>(),
+    query,
+  ]);
+  if (!adminUserResult.data) redirect("/admin/login");
   const activeOrders = (data as OrderWithItems[] | null) ?? [];
 
   const adminClient = createAdminClient();
