@@ -151,135 +151,139 @@ export default async function AdminOrdersHistoryPage({
   const cancelledRangeStart = (selectedCancelledPage - 1) * PAGE_SIZE + 1;
 
   return (
-    <div className="min-h-screen px-5 py-10 max-w-[1400px] mx-auto">
+    <div className="min-h-screen">
       <AdminHeader />
-      <OrdersTabs active="/admin/orders/history" />
-      <div className="flex items-center justify-between gap-4 flex-wrap mb-6">
-        <h1 className="font-heading text-gold text-2xl">Order History</h1>
+      <div className="px-5 py-10 max-w-[1400px] mx-auto">
+        <OrdersTabs active="/admin/orders/history" />
+        <div className="flex items-center justify-between gap-4 flex-wrap mb-6">
+          <h1 className="font-heading text-gold text-2xl">Order History</h1>
 
-        <form method="GET" className="flex items-center gap-2">
-          <input
-            type="text"
-            name="q"
-            defaultValue={searchTerm}
-            placeholder="Search order # or phone"
-            className="bg-bg2 border border-line rounded-btn px-3 py-2 text-cream text-sm font-body placeholder:text-muted w-56"
-          />
-          <button
-            type="submit"
-            className="rounded-btn bg-red text-white font-body font-semibold text-sm px-4 py-2 hover:bg-red-deep"
-          >
-            Search
-          </button>
-          {searchTerm && (
-            <Link
-              href="/admin/orders/history"
-              className="text-muted text-xs font-body underline underline-offset-2 hover:text-gold"
-            >
-              Clear
-            </Link>
-          )}
-        </form>
-      </div>
-
-      {error && (
-        <p className="text-red font-body text-sm mb-4">
-          Unable to load orders.
-        </p>
-      )}
-
-      <div
-        className="grid gap-4"
-        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}
-      >
-        <div className="flex flex-col gap-3">
-          <h2 className="font-heading text-cream text-sm uppercase tracking-wide border-b border-line pb-2">
-            Completed · {completedTotal}
-          </h2>
-          {searchTerm ? (
-            <p className="text-muted text-[11px] font-body">
-              Matching &ldquo;{searchTerm}&rdquo;
-            </p>
-          ) : (
-            <>
-              <DateNav
-                paramName="completedDate"
-                selectedDate={selectedCompletedDate}
-                todayStr={todayStr}
-              />
-              <p className="text-muted text-[11px] font-body">
-                {dateLabelFor(selectedCompletedDate, todayStr, yesterdayStr)}
-                {completedTotal > PAGE_SIZE &&
-                  ` — showing ${completedRangeStart}–${completedRangeStart + completedOrders.length - 1} of ${completedTotal}`}
-              </p>
-              <PageNav
-                basePath="/admin/orders/history"
-                dateParamName="completedDate"
-                selectedDate={selectedCompletedDate}
-                todayStr={todayStr}
-                pageParamName="completedPage"
-                page={selectedCompletedPage}
-                totalPages={completedTotalPages}
-              />
-            </>
-          )}
-          {completedOrders.map((order) => (
-            <OrderCard
-              key={order.id}
-              order={order}
-              screenshotUrl={screenshotUrls[order.id]}
+          <form method="GET" className="flex items-center gap-2">
+            <input
+              type="text"
+              name="q"
+              defaultValue={searchTerm}
+              placeholder="Search order # or phone"
+              className="bg-bg2 border border-line rounded-btn px-3 py-2 text-cream text-sm font-body placeholder:text-muted w-56"
             />
-          ))}
-          {completedOrders.length === 0 && (
-            <p className="text-muted text-xs font-body">
-              {searchTerm ? "No match" : "No orders"}
-            </p>
-          )}
+            <button
+              type="submit"
+              className="rounded-btn bg-red text-white font-body font-semibold text-sm px-4 py-2 hover:bg-red-deep"
+            >
+              Search
+            </button>
+            {searchTerm && (
+              <Link
+                href="/admin/orders/history"
+                className="text-muted text-xs font-body underline underline-offset-2 hover:text-gold"
+              >
+                Clear
+              </Link>
+            )}
+          </form>
         </div>
 
-        <div className="flex flex-col gap-3">
-          <h2 className="font-heading text-cream text-sm uppercase tracking-wide border-b border-line pb-2">
-            Cancelled · {cancelledTotal}
-          </h2>
-          {searchTerm ? (
-            <p className="text-muted text-[11px] font-body">
-              Matching &ldquo;{searchTerm}&rdquo;
-            </p>
-          ) : (
-            <>
-              <DateNav
-                paramName="cancelledDate"
-                selectedDate={selectedCancelledDate}
-                todayStr={todayStr}
-              />
+        {error && (
+          <p className="text-red font-body text-sm mb-4">
+            Unable to load orders.
+          </p>
+        )}
+
+        <div
+          className="grid gap-4"
+          style={{
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          }}
+        >
+          <div className="flex flex-col gap-3">
+            <h2 className="font-heading text-cream text-sm uppercase tracking-wide border-b border-line pb-2">
+              Completed · {completedTotal}
+            </h2>
+            {searchTerm ? (
               <p className="text-muted text-[11px] font-body">
-                {dateLabelFor(selectedCancelledDate, todayStr, yesterdayStr)}
-                {cancelledTotal > PAGE_SIZE &&
-                  ` — showing ${cancelledRangeStart}–${cancelledRangeStart + cancelledOrders.length - 1} of ${cancelledTotal}`}
+                Matching &ldquo;{searchTerm}&rdquo;
               </p>
-              <PageNav
-                basePath="/admin/orders/history"
-                dateParamName="cancelledDate"
-                selectedDate={selectedCancelledDate}
-                todayStr={todayStr}
-                pageParamName="cancelledPage"
-                page={selectedCancelledPage}
-                totalPages={cancelledTotalPages}
+            ) : (
+              <>
+                <DateNav
+                  paramName="completedDate"
+                  selectedDate={selectedCompletedDate}
+                  todayStr={todayStr}
+                />
+                <p className="text-muted text-[11px] font-body">
+                  {dateLabelFor(selectedCompletedDate, todayStr, yesterdayStr)}
+                  {completedTotal > PAGE_SIZE &&
+                    ` — showing ${completedRangeStart}–${completedRangeStart + completedOrders.length - 1} of ${completedTotal}`}
+                </p>
+                <PageNav
+                  basePath="/admin/orders/history"
+                  dateParamName="completedDate"
+                  selectedDate={selectedCompletedDate}
+                  todayStr={todayStr}
+                  pageParamName="completedPage"
+                  page={selectedCompletedPage}
+                  totalPages={completedTotalPages}
+                />
+              </>
+            )}
+            {completedOrders.map((order) => (
+              <OrderCard
+                key={order.id}
+                order={order}
+                screenshotUrl={screenshotUrls[order.id]}
               />
-            </>
-          )}
-          {cancelledOrders.map((order) => (
-            <OrderCard
-              key={order.id}
-              order={order}
-              screenshotUrl={screenshotUrls[order.id]}
-            />
-          ))}
-          {cancelledOrders.length === 0 && (
-            <p className="text-muted text-xs font-body">
-              {searchTerm ? "No match" : "No cancelled orders"}
-            </p>
-          )}
+            ))}
+            {completedOrders.length === 0 && (
+              <p className="text-muted text-xs font-body">
+                {searchTerm ? "No match" : "No orders"}
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <h2 className="font-heading text-cream text-sm uppercase tracking-wide border-b border-line pb-2">
+              Cancelled · {cancelledTotal}
+            </h2>
+            {searchTerm ? (
+              <p className="text-muted text-[11px] font-body">
+                Matching &ldquo;{searchTerm}&rdquo;
+              </p>
+            ) : (
+              <>
+                <DateNav
+                  paramName="cancelledDate"
+                  selectedDate={selectedCancelledDate}
+                  todayStr={todayStr}
+                />
+                <p className="text-muted text-[11px] font-body">
+                  {dateLabelFor(selectedCancelledDate, todayStr, yesterdayStr)}
+                  {cancelledTotal > PAGE_SIZE &&
+                    ` — showing ${cancelledRangeStart}–${cancelledRangeStart + cancelledOrders.length - 1} of ${cancelledTotal}`}
+                </p>
+                <PageNav
+                  basePath="/admin/orders/history"
+                  dateParamName="cancelledDate"
+                  selectedDate={selectedCancelledDate}
+                  todayStr={todayStr}
+                  pageParamName="cancelledPage"
+                  page={selectedCancelledPage}
+                  totalPages={cancelledTotalPages}
+                />
+              </>
+            )}
+            {cancelledOrders.map((order) => (
+              <OrderCard
+                key={order.id}
+                order={order}
+                screenshotUrl={screenshotUrls[order.id]}
+              />
+            ))}
+            {cancelledOrders.length === 0 && (
+              <p className="text-muted text-xs font-body">
+                {searchTerm ? "No match" : "No cancelled orders"}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>

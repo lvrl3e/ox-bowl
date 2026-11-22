@@ -72,82 +72,88 @@ export default async function AdminOrdersPage({
   );
 
   return (
-    <div className="min-h-screen px-5 py-10 max-w-[1400px] mx-auto">
+    <div className="min-h-screen">
       <AdminHeader />
-      <OrdersTabs active="/admin/orders" />
-      <div className="flex items-center justify-between gap-4 flex-wrap mb-6">
-        <h1 className="font-heading text-gold text-2xl">Orders</h1>
+      <div className="px-5 py-10 max-w-[1400px] mx-auto">
+        <OrdersTabs active="/admin/orders" />
+        <div className="flex items-center justify-between gap-4 flex-wrap mb-6">
+          <h1 className="font-heading text-gold text-2xl">Orders</h1>
 
-        <form method="GET" className="flex items-center gap-2">
-          <input
-            type="text"
-            name="q"
-            defaultValue={searchTerm}
-            placeholder="Search order # or phone"
-            className="bg-bg2 border border-line rounded-btn px-3 py-2 text-cream text-sm font-body placeholder:text-muted w-56"
-          />
-          <button
-            type="submit"
-            className="rounded-btn bg-red text-white font-body font-semibold text-sm px-4 py-2 hover:bg-red-deep"
-          >
-            Search
-          </button>
-          {searchTerm && (
-            <Link
-              href="/admin/orders"
-              className="text-muted text-xs font-body underline underline-offset-2 hover:text-gold"
+          <form method="GET" className="flex items-center gap-2">
+            <input
+              type="text"
+              name="q"
+              defaultValue={searchTerm}
+              placeholder="Search order # or phone"
+              className="bg-bg2 border border-line rounded-btn px-3 py-2 text-cream text-sm font-body placeholder:text-muted w-56"
+            />
+            <button
+              type="submit"
+              className="rounded-btn bg-red text-white font-body font-semibold text-sm px-4 py-2 hover:bg-red-deep"
             >
-              Clear
+              Search
+            </button>
+            {searchTerm && (
+              <Link
+                href="/admin/orders"
+                className="text-muted text-xs font-body underline underline-offset-2 hover:text-gold"
+              >
+                Clear
+              </Link>
+            )}
+          </form>
+        </div>
+
+        {error && (
+          <p className="text-red font-body text-sm mb-4">
+            Unable to load orders.
+          </p>
+        )}
+        {searchTerm && (
+          <p className="text-muted text-xs font-body mb-4">
+            Showing Received/Preparing/Ready matching &ldquo;{searchTerm}
+            &rdquo;. Completed and Cancelled orders are searched from{" "}
+            <Link
+              href="/admin/orders/history"
+              className="underline underline-offset-2 hover:text-gold"
+            >
+              Order History
             </Link>
-          )}
-        </form>
-      </div>
+            .
+          </p>
+        )}
 
-      {error && (
-        <p className="text-red font-body text-sm mb-4">
-          Unable to load orders.
-        </p>
-      )}
-      {searchTerm && (
-        <p className="text-muted text-xs font-body mb-4">
-          Showing Received/Preparing/Ready matching &ldquo;{searchTerm}&rdquo;.
-          Completed and Cancelled orders are searched from{" "}
-          <Link
-            href="/admin/orders/history"
-            className="underline underline-offset-2 hover:text-gold"
-          >
-            Order History
-          </Link>
-          .
-        </p>
-      )}
-
-      <div
-        className="grid gap-4"
-        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}
-      >
-        {BOARD_STATUSES.map((status) => {
-          const columnOrders = activeOrders.filter((o) => o.status === status);
-          return (
-            <div key={status} className="flex flex-col gap-3">
-              <h2 className="font-heading text-cream text-sm uppercase tracking-wide border-b border-line pb-2">
-                {status} · {columnOrders.length}
-              </h2>
-              {columnOrders.map((order) => (
-                <OrderCard
-                  key={order.id}
-                  order={order}
-                  screenshotUrl={screenshotUrls[order.id]}
-                />
-              ))}
-              {columnOrders.length === 0 && (
-                <p className="text-muted text-xs font-body">
-                  {searchTerm ? "No match in this column" : "No orders"}
-                </p>
-              )}
-            </div>
-          );
-        })}
+        <div
+          className="grid gap-4"
+          style={{
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          }}
+        >
+          {BOARD_STATUSES.map((status) => {
+            const columnOrders = activeOrders.filter(
+              (o) => o.status === status,
+            );
+            return (
+              <div key={status} className="flex flex-col gap-3">
+                <h2 className="font-heading text-cream text-sm uppercase tracking-wide border-b border-line pb-2">
+                  {status} · {columnOrders.length}
+                </h2>
+                {columnOrders.map((order) => (
+                  <OrderCard
+                    key={order.id}
+                    order={order}
+                    screenshotUrl={screenshotUrls[order.id]}
+                  />
+                ))}
+                {columnOrders.length === 0 && (
+                  <p className="text-muted text-xs font-body">
+                    {searchTerm ? "No match in this column" : "No orders"}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
