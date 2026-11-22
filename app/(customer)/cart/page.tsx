@@ -12,6 +12,10 @@ export const metadata: Metadata = {
  * mobile, customers mostly use the drawer (tap the header's Cart
  * button); this page is handy as a direct link or on wider screens.
  */
+// Delivery fee config and store status must always be live — see
+// app/(customer)/page.tsx.
+export const dynamic = "force-dynamic";
+
 export default async function CartPage() {
   const { settings } = await getSettings();
 

@@ -6,6 +6,9 @@ import Footer from "@/components/customer/Footer";
 import { getMenu } from "@/lib/data/menu";
 import { getSettings } from "@/lib/data/settings";
 
+// Prices and sold-out status must always be live — see app/(customer)/page.tsx.
+export const dynamic = "force-dynamic";
+
 export default async function OrderPage() {
   const [{ categories }, { settings }] = await Promise.all([
     getMenu(),

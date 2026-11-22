@@ -9,6 +9,12 @@ import { getSettings, currentDayKey } from "@/lib/data/settings";
 import { getMenu } from "@/lib/data/menu";
 import { formatTime12h } from "@/lib/format";
 
+// Menu/settings data (prices, sold-out status, store hours) must always
+// be live — without this, Next prerenders this page once at build time
+// and Vercel's edge cache serves that snapshot indefinitely, regardless
+// of revalidatePath() calls from admin actions.
+export const dynamic = "force-dynamic";
+
 const FAVORITE_SLUGS = [
   "giant-chicken-leg-quarter",
   "crispy-pata",
