@@ -25,10 +25,15 @@ export default async function AdminSettingsPage() {
   if (!adminUser) redirect("/admin/login");
 
   return (
-    <div className="min-h-screen px-5 py-10 max-w-[720px] mx-auto">
-      <AdminHeader active="/admin/settings" />
-      <h1 className="font-heading text-gold text-2xl mb-6">Settings</h1>
-      <SettingsForm settings={settings} isOwner={adminUser.role === "owner"} />
+    <div className="min-h-screen">
+      <AdminHeader />
+      <div className="px-5 py-10 max-w-[720px] mx-auto">
+        <h1 className="font-heading text-gold text-2xl mb-6">Settings</h1>
+        <SettingsForm
+          settings={settings}
+          isOwner={adminUser.role === "owner"}
+        />
+      </div>
     </div>
   );
 }

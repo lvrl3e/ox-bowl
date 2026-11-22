@@ -25,46 +25,48 @@ export default async function AdminAccountPage() {
   const isOwner = adminUser.role === "owner";
 
   return (
-    <div className="min-h-screen px-5 py-10 max-w-[720px] mx-auto">
-      <AdminHeader active="/admin/account" />
-      <h1 className="font-heading text-gold text-2xl mb-6">My Account</h1>
+    <div className="min-h-screen">
+      <AdminHeader />
+      <div className="px-5 py-10 max-w-[720px] mx-auto">
+        <h1 className="font-heading text-gold text-2xl mb-6">My Account</h1>
 
-      <div
-        className="relative overflow-hidden rounded-card border border-line bg-bg2 px-6 py-5 mb-6 flex items-center gap-4"
-        style={{
-          backgroundImage:
-            "radial-gradient(ellipse 70% 100% at 0% 0%, rgba(200,16,46,0.18), transparent 70%)",
-        }}
-      >
-        <span
-          className={`w-14 h-14 rounded-full flex items-center justify-center font-heading text-xl shrink-0 ${
-            isOwner ? "bg-gold/20 text-gold" : "bg-red/15 text-red"
-          }`}
+        <div
+          className="relative overflow-hidden rounded-card border border-line bg-bg2 px-6 py-5 mb-6 flex items-center gap-4"
+          style={{
+            backgroundImage:
+              "radial-gradient(ellipse 70% 100% at 0% 0%, rgba(200,16,46,0.18), transparent 70%)",
+          }}
         >
-          {initial}
-        </span>
-        <div>
-          <p className="font-heading text-cream text-xl">{displayName}</p>
           <span
-            className={`inline-block mt-1 rounded-pill text-[11px] font-body font-semibold tracking-wide px-2.5 py-1 uppercase ${
-              isOwner ? "bg-gold/15 text-gold" : "bg-red/15 text-red"
+            className={`w-14 h-14 rounded-full flex items-center justify-center font-heading text-xl shrink-0 ${
+              isOwner ? "bg-gold/20 text-gold" : "bg-red/15 text-red"
             }`}
           >
-            {adminUser.role}
+            {initial}
           </span>
+          <div>
+            <p className="font-heading text-cream text-xl">{displayName}</p>
+            <span
+              className={`inline-block mt-1 rounded-pill text-[11px] font-body font-semibold tracking-wide px-2.5 py-1 uppercase ${
+                isOwner ? "bg-gold/15 text-gold" : "bg-red/15 text-red"
+              }`}
+            >
+              {adminUser.role}
+            </span>
+          </div>
         </div>
+
+        <ChangePasswordForm />
+
+        <form action={logoutAction} className="mt-6">
+          <button
+            type="submit"
+            className="rounded-btn border border-line text-cream font-body text-sm px-4 py-2.5 min-h-11 hover:bg-bg2 transition-colors"
+          >
+            Sign out
+          </button>
+        </form>
       </div>
-
-      <ChangePasswordForm />
-
-      <form action={logoutAction} className="mt-6">
-        <button
-          type="submit"
-          className="rounded-btn border border-line text-cream font-body text-sm px-4 py-2.5 min-h-11 hover:bg-bg2 transition-colors"
-        >
-          Sign out
-        </button>
-      </form>
     </div>
   );
 }

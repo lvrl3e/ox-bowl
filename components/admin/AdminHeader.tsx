@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
 const NAV = [
@@ -14,12 +15,17 @@ const NAV = [
   { href: "/admin/account", label: "Account" },
 ];
 
-export default function AdminHeader({ active }: { active: string }) {
+function isActive(pathname: string, href: string) {
+  return href === "/admin" ? pathname === href : pathname.startsWith(href);
+}
+
+export default function AdminHeader() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
-    <header className="relative border-b border-line h-16 mb-8 flex items-center">
-      <div className="w-full flex items-center justify-between gap-4">
+    <header className="relative border-b border-line bg-bg">
+      <div className="max-w-[1400px] mx-auto px-5 h-16 flex items-center justify-between gap-4">
         <Link
           href="/admin"
           className="flex items-center gap-2 leading-tight shrink-0"
@@ -51,7 +57,7 @@ export default function AdminHeader({ active }: { active: string }) {
               href={item.href}
               className={clsx(
                 "rounded-pill px-3 py-1.5 text-sm font-body font-semibold transition-colors",
-                active === item.href
+                isActive(pathname, item.href)
                   ? "bg-red text-white"
                   : "text-cream border border-line hover:bg-bg2 hover:border-gold"
               )}
@@ -97,7 +103,7 @@ export default function AdminHeader({ active }: { active: string }) {
               onClick={() => setOpen(false)}
               className={clsx(
                 "rounded-btn px-3 py-2.5 text-sm font-body font-semibold transition-colors",
-                active === item.href
+                isActive(pathname, item.href)
                   ? "bg-red text-white"
                   : "text-cream border border-line hover:bg-bg2 hover:border-gold"
               )}

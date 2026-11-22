@@ -36,7 +36,9 @@ export default async function AdminOrdersPage({
     // Escape ilike wildcards so a literal "%" or "_" in a search term
     // doesn't act as a wildcard.
     const escaped = searchTerm.replace(/[%_]/g, (m) => `\\${m}`);
-    query = query.or(`order_number.ilike.%${escaped}%,customer_mobile.ilike.%${escaped}%`);
+    query = query.or(
+      `order_number.ilike.%${escaped}%,customer_mobile.ilike.%${escaped}%`,
+    );
   }
 
   // Defense-in-depth: the service-role client below bypasses RLS
@@ -66,12 +68,12 @@ export default async function AdminOrdersPage({
           .from("payment-screenshots")
           .createSignedUrl(o.payment_screenshot_path as string, 60 * 30);
         if (data?.signedUrl) screenshotUrls[o.id] = data.signedUrl;
-      })
+      }),
   );
 
   return (
     <div className="min-h-screen px-5 py-10 max-w-[1400px] mx-auto">
-      <AdminHeader active="/admin/orders" />
+      <AdminHeader />
       <OrdersTabs active="/admin/orders" />
       <div className="flex items-center justify-between gap-4 flex-wrap mb-6">
         <h1 className="font-heading text-gold text-2xl">Orders</h1>
@@ -102,13 +104,18 @@ export default async function AdminOrdersPage({
       </div>
 
       {error && (
-        <p className="text-red font-body text-sm mb-4">Unable to load orders.</p>
+        <p className="text-red font-body text-sm mb-4">
+          Unable to load orders.
+        </p>
       )}
       {searchTerm && (
         <p className="text-muted text-xs font-body mb-4">
-          Showing Received/Preparing/Ready matching &ldquo;{searchTerm}&rdquo;. Completed
-          and Cancelled orders are searched from{" "}
-          <Link href="/admin/orders/history" className="underline underline-offset-2 hover:text-gold">
+          Showing Received/Preparing/Ready matching &ldquo;{searchTerm}&rdquo;.
+          Completed and Cancelled orders are searched from{" "}
+          <Link
+            href="/admin/orders/history"
+            className="underline underline-offset-2 hover:text-gold"
+          >
             Order History
           </Link>
           .

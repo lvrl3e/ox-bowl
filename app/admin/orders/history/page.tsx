@@ -33,7 +33,8 @@ export default async function AdminOrdersHistoryPage({
     q?: string;
   }>;
 }) {
-  const { completedDate, cancelledDate, completedPage, cancelledPage, q } = await searchParams;
+  const { completedDate, cancelledDate, completedPage, cancelledPage, q } =
+    await searchParams;
   const searchTerm = q?.trim() ?? "";
   const selectedCompletedPage = parsePage(completedPage);
   const selectedCancelledPage = parsePage(cancelledPage);
@@ -81,7 +82,10 @@ export default async function AdminOrdersHistoryPage({
       .gte("completed_at", completedBounds.startIso)
       .lte("completed_at", completedBounds.endIso)
       .order("completed_at", { ascending: false })
-      .range((selectedCompletedPage - 1) * PAGE_SIZE, selectedCompletedPage * PAGE_SIZE - 1);
+      .range(
+        (selectedCompletedPage - 1) * PAGE_SIZE,
+        selectedCompletedPage * PAGE_SIZE - 1,
+      );
     // Cancelled orders have no dedicated "cancelled_at" column, so
     // updated_at is the closest proxy — cancelling is a status update
     // like any other, and nothing else touches a cancelled order after.
@@ -89,7 +93,10 @@ export default async function AdminOrdersHistoryPage({
       .gte("updated_at", cancelledBounds.startIso)
       .lte("updated_at", cancelledBounds.endIso)
       .order("updated_at", { ascending: false })
-      .range((selectedCancelledPage - 1) * PAGE_SIZE, selectedCancelledPage * PAGE_SIZE - 1);
+      .range(
+        (selectedCancelledPage - 1) * PAGE_SIZE,
+        selectedCancelledPage * PAGE_SIZE - 1,
+      );
   }
 
   // Defense-in-depth: the service-role client below bypasses RLS
@@ -98,21 +105,25 @@ export default async function AdminOrdersHistoryPage({
   // it alongside the order queries (instead of before) since RLS already
   // gates those on their own — we just discard the results below if the
   // admin check fails.
-  const [adminUserResult, completedResult, cancelledResult] = await Promise.all([
-    supabase
-      .from("admin_users")
-      .select("role")
-      .eq("id", userData.user.id)
-      .single<{ role: AdminRole }>(),
-    completedQuery,
-    cancelledQuery,
-  ]);
+  const [adminUserResult, completedResult, cancelledResult] = await Promise.all(
+    [
+      supabase
+        .from("admin_users")
+        .select("role")
+        .eq("id", userData.user.id)
+        .single<{ role: AdminRole }>(),
+      completedQuery,
+      cancelledQuery,
+    ],
+  );
   if (!adminUserResult.data) redirect("/admin/login");
 
   const error = completedResult.error ?? cancelledResult.error;
-  const completedOrders = (completedResult.data as OrderWithItems[] | null) ?? [];
+  const completedOrders =
+    (completedResult.data as OrderWithItems[] | null) ?? [];
   const completedTotal = completedResult.count ?? completedOrders.length;
-  const cancelledOrders = (cancelledResult.data as OrderWithItems[] | null) ?? [];
+  const cancelledOrders =
+    (cancelledResult.data as OrderWithItems[] | null) ?? [];
   const cancelledTotal = cancelledResult.count ?? cancelledOrders.length;
 
   const adminClient = createAdminClient();
@@ -125,17 +136,23 @@ export default async function AdminOrdersHistoryPage({
           .from("payment-screenshots")
           .createSignedUrl(o.payment_screenshot_path as string, 60 * 30);
         if (data?.signedUrl) screenshotUrls[o.id] = data.signedUrl;
-      })
+      }),
   );
 
-  const completedTotalPages = Math.max(1, Math.ceil(completedTotal / PAGE_SIZE));
-  const cancelledTotalPages = Math.max(1, Math.ceil(cancelledTotal / PAGE_SIZE));
+  const completedTotalPages = Math.max(
+    1,
+    Math.ceil(completedTotal / PAGE_SIZE),
+  );
+  const cancelledTotalPages = Math.max(
+    1,
+    Math.ceil(cancelledTotal / PAGE_SIZE),
+  );
   const completedRangeStart = (selectedCompletedPage - 1) * PAGE_SIZE + 1;
   const cancelledRangeStart = (selectedCancelledPage - 1) * PAGE_SIZE + 1;
 
   return (
     <div className="min-h-screen px-5 py-10 max-w-[1400px] mx-auto">
-      <AdminHeader active="/admin/orders" />
+      <AdminHeader />
       <OrdersTabs active="/admin/orders/history" />
       <div className="flex items-center justify-between gap-4 flex-wrap mb-6">
         <h1 className="font-heading text-gold text-2xl">Order History</h1>
@@ -166,7 +183,9 @@ export default async function AdminOrdersHistoryPage({
       </div>
 
       {error && (
-        <p className="text-red font-body text-sm mb-4">Unable to load orders.</p>
+        <p className="text-red font-body text-sm mb-4">
+          Unable to load orders.
+        </p>
       )}
 
       <div

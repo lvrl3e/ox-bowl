@@ -18,85 +18,97 @@ export default async function AdminStaffPage() {
   // via the service-role admin API and match by id.
   const adminClient = createAdminClient();
 
-  const [adminUserResult, staffRowsResult, authUsersResult] = await Promise.all([
-    supabase
-      .from("admin_users")
-      .select("role")
-      .eq("id", userData.user.id)
-      .single<{ role: AdminRole }>(),
-    supabase.from("admin_users").select("*").order("created_at", { ascending: true }),
-    adminClient.auth.admin.listUsers(),
-  ]);
+  const [adminUserResult, staffRowsResult, authUsersResult] = await Promise.all(
+    [
+      supabase
+        .from("admin_users")
+        .select("role")
+        .eq("id", userData.user.id)
+        .single<{ role: AdminRole }>(),
+      supabase
+        .from("admin_users")
+        .select("*")
+        .order("created_at", { ascending: true }),
+      adminClient.auth.admin.listUsers(),
+    ],
+  );
   const adminUser = adminUserResult.data;
   if (!adminUser) redirect("/admin/login");
   const isOwner = adminUser.role === "owner";
 
   const staff = (staffRowsResult.data as AdminUser[] | null) ?? [];
   const emailById = new Map(
-    authUsersResult.data?.users.map((u) => [u.id, u.email]) ?? []
+    authUsersResult.data?.users.map((u) => [u.id, u.email]) ?? [],
   );
 
   return (
-    <div className="min-h-screen px-5 py-10 max-w-[720px] mx-auto">
-      <AdminHeader active="/admin/staff" />
-      <h1 className="font-heading text-gold text-2xl mb-1">Staff</h1>
-      <p className="text-muted text-sm font-body mb-6">
-        {staff.length} account{staff.length === 1 ? "" : "s"} with admin access.
-      </p>
+    <div className="min-h-screen">
+      <AdminHeader />
+      <div className="px-5 py-10 max-w-[720px] mx-auto">
+        <h1 className="font-heading text-gold text-2xl mb-1">Staff</h1>
+        <p className="text-muted text-sm font-body mb-6">
+          {staff.length} account{staff.length === 1 ? "" : "s"} with admin
+          access.
+        </p>
 
-      <div className="flex flex-col gap-3 mb-8">
-        {staff.map((member) => {
-          const memberIsOwner = member.role === "owner";
-          const initial = (member.name ?? emailById.get(member.id) ?? "?")
-            .trim()
-            .charAt(0)
-            .toUpperCase();
-          return (
-            <div
-              key={member.id}
-              className="flex items-center justify-between gap-3 bg-bg2 border border-line rounded-card px-4 py-3 hover:border-gold/40 transition-colors"
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <span
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-heading text-sm shrink-0 ${
-                    memberIsOwner ? "bg-gold/20 text-gold" : "bg-red/15 text-red"
-                  }`}
-                >
-                  {initial}
-                </span>
-                <div className="min-w-0">
-                  <p className="text-cream font-body font-semibold text-sm truncate">
-                    {member.name ?? "Unnamed"}
-                  </p>
-                  <p className="text-muted text-xs font-body truncate">
-                    {emailById.get(member.id) ?? "unknown email"}
-                  </p>
+        <div className="flex flex-col gap-3 mb-8">
+          {staff.map((member) => {
+            const memberIsOwner = member.role === "owner";
+            const initial = (member.name ?? emailById.get(member.id) ?? "?")
+              .trim()
+              .charAt(0)
+              .toUpperCase();
+            return (
+              <div
+                key={member.id}
+                className="flex items-center justify-between gap-3 bg-bg2 border border-line rounded-card px-4 py-3 hover:border-gold/40 transition-colors"
+              >
+                <div className="flex items-center gap-3 min-w-0">
                   <span
-                    className={`inline-block mt-1 rounded-pill text-[10px] font-body font-semibold tracking-wide px-2 py-0.5 uppercase ${
-                      memberIsOwner ? "bg-gold/15 text-gold" : "bg-red/15 text-red"
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-heading text-sm shrink-0 ${
+                      memberIsOwner
+                        ? "bg-gold/20 text-gold"
+                        : "bg-red/15 text-red"
                     }`}
                   >
-                    {member.role}
+                    {initial}
                   </span>
+                  <div className="min-w-0">
+                    <p className="text-cream font-body font-semibold text-sm truncate">
+                      {member.name ?? "Unnamed"}
+                    </p>
+                    <p className="text-muted text-xs font-body truncate">
+                      {emailById.get(member.id) ?? "unknown email"}
+                    </p>
+                    <span
+                      className={`inline-block mt-1 rounded-pill text-[10px] font-body font-semibold tracking-wide px-2 py-0.5 uppercase ${
+                        memberIsOwner
+                          ? "bg-gold/15 text-gold"
+                          : "bg-red/15 text-red"
+                      }`}
+                    >
+                      {member.role}
+                    </span>
+                  </div>
                 </div>
+                {isOwner && member.id !== userData.user.id && (
+                  <form action={removeStaffAction} className="shrink-0">
+                    <input type="hidden" name="id" value={member.id} />
+                    <button
+                      type="submit"
+                      className="text-muted text-xs font-body underline underline-offset-2 hover:text-red"
+                    >
+                      Remove
+                    </button>
+                  </form>
+                )}
               </div>
-              {isOwner && member.id !== userData.user.id && (
-                <form action={removeStaffAction} className="shrink-0">
-                  <input type="hidden" name="id" value={member.id} />
-                  <button
-                    type="submit"
-                    className="text-muted text-xs font-body underline underline-offset-2 hover:text-red"
-                  >
-                    Remove
-                  </button>
-                </form>
-              )}
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
 
-      <StaffForm isOwner={isOwner} />
+        <StaffForm isOwner={isOwner} />
+      </div>
     </div>
   );
 }
