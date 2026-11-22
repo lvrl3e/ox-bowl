@@ -45,3 +45,16 @@ export const forgotPasswordSchema = z.object({
 });
 
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+
+const priceSchema = z.coerce.number().min(0, "Price can't be negative");
+
+export const updateMenuItemSchema = z.object({
+  itemId: z.string().uuid(),
+  description: z.string().trim().max(500, "Keep it under 500 characters"),
+  basePrice: priceSchema.nullable(),
+  variantPrices: z.array(
+    z.object({ id: z.string().uuid(), price: priceSchema }),
+  ),
+});
+
+export type UpdateMenuItemInput = z.infer<typeof updateMenuItemSchema>;
