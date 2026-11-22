@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import LoginForm from "@/components/admin/LoginForm";
 
 export const metadata: Metadata = {
@@ -15,6 +17,10 @@ export default async function AdminLoginPage({
 }) {
   const { next } = await searchParams;
   const safeNext = next && next.startsWith("/admin") ? next : "/admin";
+
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getUser();
+  if (data.user) redirect(safeNext);
 
   return (
     <div
