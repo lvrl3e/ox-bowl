@@ -27,7 +27,7 @@ export default async function OrderPage() {
           aria-hidden="true"
           className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-gold/15 blur-3xl"
         />
-        <div className="relative max-w-[1000px] mx-auto px-5 pt-8 pb-6 text-center">
+        <div className="relative max-w-[1280px] mx-auto px-5 pt-8 pb-6 text-center">
           <span className="inline-flex items-center gap-2 text-gold text-xs font-body font-semibold tracking-[0.2em] uppercase">
             <span className="h-px w-6 bg-gold/60" />
             Full Menu
@@ -45,7 +45,7 @@ export default async function OrderPage() {
 
       <CategoryTabs categories={categories.map((c) => ({ slug: c.slug, name: c.name }))} />
 
-      <div id="menu" className="max-w-[1000px] mx-auto px-5">
+      <div id="menu" className="max-w-[1280px] mx-auto px-5">
         {categories.map((category, i) => (
           <div key={category.id}>
             {i > 0 && <SectionDivider />}

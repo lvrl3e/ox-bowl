@@ -12,8 +12,8 @@ export default function Header() {
   const count = hydrated ? cartCount(items) : 0;
 
   return (
-    <header className="sticky top-0 z-30 h-16 border-b-[3px] border-red bg-bg px-4 sm:px-5 flex items-center justify-between">
-      <Link href="/" className="flex items-center gap-2 leading-tight" aria-label="Ox Bowl Resto & Grill home">
+    <header className="sticky top-0 z-30 min-h-14 sm:min-h-16 border-b-[3px] border-red bg-bg px-3 sm:px-5 flex items-center justify-between gap-2">
+      <Link href="/" className="flex items-center gap-1.5 sm:gap-2 leading-tight shrink-0" aria-label="Ox Bowl Resto & Grill home">
         <Image
           src="/icon-mark-64.png"
           alt=""
@@ -21,24 +21,24 @@ export default function Header() {
           width={75}
           height={64}
           priority
-          className="h-9 w-auto shrink-0"
+          className="h-7 sm:h-9 w-auto shrink-0"
         />
         <div>
-          <p className="font-heading text-lg sm:text-xl">
+          <p className="font-heading text-base sm:text-xl whitespace-nowrap">
             <span className="text-cream">OX</span>{" "}
             <span className="text-red">BOWL</span>
           </p>
-          <p className="text-[10px] text-muted tracking-widest -mt-1 font-body">
+          <p className="hidden sm:block text-[10px] text-muted tracking-widest -mt-1 font-body">
             RESTO &amp; GRILL
           </p>
         </div>
       </Link>
 
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-1.5 sm:gap-3">
         <Link
           href="/track"
           aria-label="Track your order"
-          className="rounded-pill border border-line text-cream text-sm font-body font-semibold px-3 sm:px-4 py-2.5 min-h-11 flex items-center gap-1.5 hover:bg-bg2 hover:border-gold hover:text-gold transition-colors"
+          className="rounded-pill border border-line text-cream text-xs sm:text-sm font-body font-semibold px-2.5 sm:px-4 py-2 sm:py-2.5 min-h-10 sm:min-h-11 flex items-center gap-1.5 whitespace-nowrap hover:bg-bg2 hover:border-gold hover:text-gold transition-colors"
         >
           <svg
             width="18"
@@ -57,7 +57,7 @@ export default function Header() {
 
         <Link
           href="/order"
-          className="rounded-pill border border-line text-cream text-sm font-body font-semibold px-3 sm:px-4 py-2.5 min-h-11 flex items-center hover:bg-red hover:border-red hover:text-white transition-colors"
+          className="rounded-pill border border-line text-cream text-xs sm:text-sm font-body font-semibold px-2.5 sm:px-4 py-2 sm:py-2.5 min-h-10 sm:min-h-11 flex items-center whitespace-nowrap hover:bg-red hover:border-red hover:text-white transition-colors"
         >
           Order now
         </Link>
@@ -66,7 +66,7 @@ export default function Header() {
           type="button"
           onClick={toggleCart}
           aria-label={`Open cart, ${count} item${count === 1 ? "" : "s"}`}
-          className="rounded-pill bg-gold text-bg font-body font-semibold text-sm px-4 py-2.5 flex items-center gap-2 min-h-11 active:scale-95 transition-transform"
+          className="rounded-pill bg-gold text-bg font-body font-semibold text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 flex items-center gap-1.5 sm:gap-2 min-h-10 sm:min-h-11 whitespace-nowrap active:scale-95 transition-transform"
         >
           <svg
             width="18"
@@ -74,6 +74,7 @@ export default function Header() {
             viewBox="0 0 24 24"
             fill="none"
             aria-hidden="true"
+            className="shrink-0"
           >
             <path
               d="M6 7h12l-1.2 10.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 7Z"
@@ -82,7 +83,7 @@ export default function Header() {
             />
             <path d="M9 7a3 3 0 1 1 6 0" stroke="currentColor" strokeWidth="1.8" />
           </svg>
-          Cart · {count}
+          <span className="hidden sm:inline">Cart ·</span> {count}
         </button>
       </div>
     </header>

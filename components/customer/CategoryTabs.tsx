@@ -45,11 +45,11 @@ export default function CategoryTabs({ categories }: CategoryTabsProps) {
   return (
     <div
       ref={tabsRef}
-      className="sticky top-16 z-20 bg-bg border-b border-line shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
+      className="sticky top-14 sm:top-16 z-20 bg-bg border-b border-line shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
       role="tablist"
       aria-label="Menu categories"
     >
-      <div className="max-w-[1000px] mx-auto px-5 py-3 flex gap-2 overflow-x-auto no-scrollbar">
+      <div className="max-w-[1280px] mx-auto px-5 py-3 flex gap-2 overflow-x-auto no-scrollbar">
         {categories.map((c) => (
           <button
             key={c.slug}

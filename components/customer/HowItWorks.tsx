@@ -55,7 +55,7 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section className="max-w-[1000px] mx-auto px-5 py-10">
+    <section className="max-w-[1280px] mx-auto px-5 py-10">
       <div className="relative inline-block">
         <h2 className="relative z-10 -skew-x-6 bg-red text-cream font-heading text-2xl sm:text-[28px] px-5 py-1.5 rounded-sm shadow-[0_6px_16px_rgba(200,16,46,0.35)]">
           <span className="inline-block skew-x-6">How to Order</span>

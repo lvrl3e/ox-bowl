@@ -12,7 +12,7 @@ export default function Footer({ settings }: FooterProps) {
 
   return (
     <footer className="border-t border-line bg-bg2">
-      <div className="max-w-[1000px] mx-auto px-5 py-10 grid gap-8 sm:grid-cols-3">
+      <div className="max-w-[1280px] mx-auto px-5 py-10 grid gap-8 sm:grid-cols-3">
         <div>
           <p className="font-heading text-cream text-lg flex items-center gap-2">
             <Image

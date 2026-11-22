@@ -7,7 +7,7 @@ interface OrderCtaProps {
 
 export default function OrderCta({ phone, messengerUrl }: OrderCtaProps) {
   return (
-    <section className="max-w-[1000px] mx-auto px-5 pb-10">
+    <section className="max-w-[1280px] mx-auto px-5 pb-10">
       <div className="relative overflow-hidden rounded-pill bg-gradient-to-r from-red-deep via-red to-red-deep border border-gold/40 shadow-[0_8px_24px_rgba(200,16,46,0.35)] px-5 sm:px-8 py-4 flex flex-wrap items-center justify-center gap-4 sm:gap-6">
         <div aria-hidden="true" className="bg-grill-lines absolute inset-0 pointer-events-none" />
         <div className="relative flex items-center gap-2 text-white font-heading text-sm sm:text-base">

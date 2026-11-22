@@ -1,6 +1,6 @@
 export default function SectionDivider() {
   return (
-    <div className="max-w-[1000px] mx-auto px-5" aria-hidden="true">
+    <div className="max-w-[1280px] mx-auto px-5" aria-hidden="true">
       <div className="flex items-center gap-3 py-2">
         <span className="h-px flex-1 bg-line" />
         <svg width="14" height="14" viewBox="0 0 24 24" className="text-gold shrink-0">

@@ -22,7 +22,7 @@ export default function Hero({ todayHoursLabel }: HeroProps) {
         className="pointer-events-none absolute -right-20 top-10 h-64 w-64 rounded-full bg-gold/15 blur-3xl"
       />
 
-      <div className="relative max-w-[1000px] mx-auto px-5 py-14 sm:py-20 text-center">
+      <div className="relative max-w-[1280px] mx-auto px-5 py-14 sm:py-20 text-center">
         <span className="inline-flex items-center gap-2 text-gold text-xs font-body font-semibold tracking-[0.2em] uppercase">
           <span className="h-px w-6 bg-gold/60" />
           Filipino Comfort Food
