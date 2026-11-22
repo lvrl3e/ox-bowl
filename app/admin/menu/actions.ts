@@ -11,15 +11,20 @@ export interface MenuActionState {
   success: boolean;
 }
 
-async function requireOwnerSession() {
+async function requireAdminSession() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
   if (!data.user) redirect("/admin/login");
+  return { supabase, userId: data.user.id };
+}
+
+async function requireOwnerSession() {
+  const { supabase, userId } = await requireAdminSession();
 
   const { data: adminUser } = await supabase
     .from("admin_users")
     .select("role")
-    .eq("id", data.user.id)
+    .eq("id", userId)
     .single<{ role: AdminRole }>();
 
   return { supabase, isOwner: adminUser?.role === "owner" };
@@ -32,19 +37,33 @@ function revalidateMenuPages() {
   revalidatePath("/checkout");
 }
 
-export async function setSoldOutAction(formData: FormData) {
-  const { supabase, isOwner } = await requireOwnerSession();
-  if (!isOwner) return;
+export async function setSoldOutAction(
+  _prevState: MenuActionState,
+  formData: FormData,
+): Promise<MenuActionState> {
+  const { supabase } = await requireAdminSession();
 
   const itemId = formData.get("itemId");
   const isSoldOut = formData.get("isSoldOut") === "true";
-  if (typeof itemId !== "string") return;
+  if (typeof itemId !== "string") {
+    return { error: "Missing item.", success: false };
+  }
 
-  await supabase
-    .from("menu_items")
-    .update({ is_sold_out: isSoldOut })
-    .eq("id", itemId);
+  // Marking something sold out is a normal shift task, not an
+  // owner-only decision — this RPC runs as security definer so any
+  // signed-in admin (owner or staff) can call it, even though direct
+  // writes to menu_items otherwise require the owner role.
+  const { data: result, error } = await supabase.rpc("set_menu_item_sold_out", {
+    p_item_id: itemId,
+    p_sold_out: isSoldOut,
+  });
+  const rpcResult = result as { success: boolean; error?: string } | null;
+  if (error || !rpcResult?.success) {
+    return { error: rpcResult?.error ?? "Failed to update.", success: false };
+  }
+
   revalidateMenuPages();
+  return { error: null, success: true };
 }
 
 export async function updateMenuItemAction(

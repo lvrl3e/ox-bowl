@@ -26,6 +26,10 @@ export default function MenuItemRow({
     updateMenuItemAction,
     initialState,
   );
+  const [soldOutState, soldOutAction, soldOutPending] = useActionState(
+    setSoldOutAction,
+    initialState,
+  );
   const soldOutFormRef = useRef<HTMLFormElement>(null);
 
   const priceLabel = item.has_variants
@@ -50,7 +54,7 @@ export default function MenuItemRow({
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-          <form ref={soldOutFormRef} action={setSoldOutAction}>
+          <form ref={soldOutFormRef} action={soldOutAction}>
             <input type="hidden" name="itemId" value={item.id} />
             <input
               type="hidden"
@@ -60,13 +64,18 @@ export default function MenuItemRow({
             <label className="flex items-center gap-1.5 text-muted text-xs font-body cursor-pointer">
               <input
                 type="checkbox"
-                disabled={!isOwner}
+                disabled={soldOutPending}
                 defaultChecked={item.is_sold_out}
                 onChange={() => soldOutFormRef.current?.requestSubmit()}
-                className="w-4 h-4 accent-red"
+                className="w-4 h-4 accent-red disabled:opacity-60"
               />
               Sold out
             </label>
+            {soldOutState.error && (
+              <p className="text-red text-xs font-body mt-1">
+                {soldOutState.error}
+              </p>
+            )}
           </form>
 
           {isOwner && (

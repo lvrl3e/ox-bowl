@@ -36,8 +36,8 @@ export default async function AdminMenuPage() {
 
         {!isOwner && (
           <p className="text-gold text-sm font-body bg-bg2 border border-line rounded-btn p-3 mb-6">
-            You&rsquo;re signed in as staff — the menu is read-only. Ask an
-            owner to change prices, descriptions, or sold-out status.
+            You&rsquo;re signed in as staff — you can mark items sold out, but
+            only the owner can edit prices and descriptions.
           </p>
         )}
 
