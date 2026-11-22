@@ -5,8 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 import type { AdminRole, OrderRow } from "@/lib/types/database";
 import { formatPeso } from "@/lib/format";
 import { manilaDayKey, manilaDateBounds } from "@/lib/admin/orders-date";
-import { isStoreOpenNow } from "@/lib/data/settings";
-import type { Settings } from "@/lib/types/database";
 import AdminHeader from "@/components/admin/AdminHeader";
 
 export const metadata: Metadata = {
@@ -37,16 +35,7 @@ export default async function AdminHomePage() {
 
   const todayBounds = manilaDateBounds(manilaDayKey(new Date()));
 
-  const [
-    adminUserResult,
-    received,
-    preparing,
-    ready,
-    needsReview,
-    completedToday,
-    settingsResult,
-    recentResult,
-  ] =
+  const [adminUserResult, received, preparing, ready, needsReview, completedToday, recentResult] =
     await Promise.all([
       supabase
         .from("admin_users")
@@ -67,7 +56,6 @@ export default async function AdminHomePage() {
         .eq("status", "completed")
         .gte("completed_at", todayBounds.startIso)
         .lte("completed_at", todayBounds.endIso),
-      supabase.from("settings").select("*").eq("id", 1).single<Settings>(),
       supabase
         .from("orders")
         .select("id, order_number, customer_name, status, total, created_at")
@@ -80,7 +68,6 @@ export default async function AdminHomePage() {
     (sum, o: { total: number }) => sum + o.total,
     0
   );
-  const storeOpen = settingsResult.data ? isStoreOpenNow(settingsResult.data).open : false;
   const recentOrders = (recentResult.data as Pick<
     OrderRow,
     "id" | "order_number" | "customer_name" | "status" | "total" | "created_at"
@@ -163,19 +150,6 @@ export default async function AdminHomePage() {
             </span>
           )}
         </div>
-        <Link
-          href="/admin/settings"
-          className={`flex items-center gap-2 rounded-pill border px-3 py-1.5 text-xs font-body font-semibold transition-colors ${
-            storeOpen
-              ? "border-gold/40 bg-gold/10 text-gold hover:bg-gold/20"
-              : "border-line bg-bg text-muted hover:bg-bg2"
-          }`}
-        >
-          <span
-            className={`w-2 h-2 rounded-full ${storeOpen ? "bg-gold" : "bg-muted"}`}
-          />
-          {storeOpen ? "Store is open" : "Store is closed"}
-        </Link>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
