@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import clsx from "clsx";
 import type { MenuItemWithVariants } from "@/lib/types/database";
 import { formatPeso } from "@/lib/format";
 
@@ -35,7 +36,10 @@ export default function CrowdFavorites({ items }: CrowdFavoritesProps) {
           <Link
             key={item.id}
             href="/order"
-            className="group relative bg-bg2 rounded-card border-t-[5px] border-red overflow-hidden transition-shadow hover:shadow-[0_0_0_1px_rgba(245,197,24,0.4),0_8px_20px_rgba(0,0,0,0.35)]"
+            className={clsx(
+              "group relative bg-bg2 rounded-card border-t-[5px] border-red overflow-hidden transition-shadow hover:shadow-[0_0_0_1px_rgba(245,197,24,0.4),0_8px_20px_rgba(0,0,0,0.35)]",
+              item.is_sold_out && "opacity-50"
+            )}
           >
             <div className="h-[100px] sm:h-[150px] relative">
               {item.image_url && (
@@ -46,6 +50,11 @@ export default function CrowdFavorites({ items }: CrowdFavoritesProps) {
                   sizes="(max-width: 640px) 50vw, 220px"
                   className="object-contain p-1.5 sm:p-2 transition-transform group-hover:scale-105"
                 />
+              )}
+              {item.is_sold_out && (
+                <span className="absolute inset-0 flex items-center justify-center bg-bg/60 text-cream text-xs sm:text-sm font-body font-semibold uppercase tracking-wide">
+                  Sold out
+                </span>
               )}
             </div>
             <div className="p-2.5 sm:p-3 flex items-center justify-between gap-2">
