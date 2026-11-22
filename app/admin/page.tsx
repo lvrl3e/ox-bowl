@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import type { AdminRole, OrderRow } from "@/lib/types/database";
 import { formatPeso } from "@/lib/format";
 import { manilaDayKey, manilaDateBounds } from "@/lib/admin/orders-date";
+import { isStoreOpenNow } from "@/lib/data/settings";
+import type { Settings } from "@/lib/types/database";
 import AdminHeader from "@/components/admin/AdminHeader";
 
 export const metadata: Metadata = {
@@ -65,7 +67,7 @@ export default async function AdminHomePage() {
         .eq("status", "completed")
         .gte("completed_at", todayBounds.startIso)
         .lte("completed_at", todayBounds.endIso),
-      supabase.from("settings").select("store_open").eq("id", 1).single<{ store_open: boolean }>(),
+      supabase.from("settings").select("*").eq("id", 1).single<Settings>(),
       supabase
         .from("orders")
         .select("id, order_number, customer_name, status, total, created_at")
@@ -78,7 +80,7 @@ export default async function AdminHomePage() {
     (sum, o: { total: number }) => sum + o.total,
     0
   );
-  const storeOpen = settingsResult.data?.store_open ?? false;
+  const storeOpen = settingsResult.data ? isStoreOpenNow(settingsResult.data).open : false;
   const recentOrders = (recentResult.data as Pick<
     OrderRow,
     "id" | "order_number" | "customer_name" | "status" | "total" | "created_at"
