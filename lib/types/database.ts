@@ -134,6 +134,13 @@ export interface AdminUser {
   created_at: string;
 }
 
+export interface OrderLookupResult {
+  order_number: string;
+  status: OrderStatus;
+  total: number;
+  received_at: string;
+}
+
 export interface TrackOrderResult {
   order_number: string;
   fulfillment_type: FulfillmentType;

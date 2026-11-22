@@ -2,6 +2,7 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
 import clsx from "clsx";
 import { useCartStore, cartSubtotal } from "@/store/cart";
@@ -75,6 +76,23 @@ export default function CheckoutForm({ settings }: CheckoutFormProps) {
       <p className="text-muted font-body text-sm px-5 py-16 text-center">
         Loading…
       </p>
+    );
+  }
+
+  if (!settings.store_open) {
+    return (
+      <div className="max-w-[600px] mx-auto px-5 py-16 text-center">
+        <h1 className="font-heading text-gold text-[32px]">Checkout</h1>
+        <p className="text-muted font-body mt-3">
+          We&rsquo;re not accepting orders right now. Please check back later.
+        </p>
+        <Link
+          href="/"
+          className="inline-block mt-6 rounded-btn bg-red text-white font-body font-semibold px-6 py-3 hover:bg-red-deep"
+        >
+          Back to home
+        </Link>
+      </div>
     );
   }
 

@@ -55,6 +55,10 @@ export async function POST(request: Request) {
   }
   const settings = settingsRow as Settings;
 
+  if (!settings.store_open) {
+    return errorResponse("The store is not accepting orders right now", 400);
+  }
+
   if (input.scheduleType === "asap") {
     const { open } = isStoreOpenNow(settings);
     if (!open) {

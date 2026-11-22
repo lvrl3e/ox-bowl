@@ -34,10 +34,30 @@ export default function Header() {
         </div>
       </Link>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
+        <Link
+          href="/track"
+          aria-label="Track your order"
+          className="rounded-pill border border-line text-cream text-sm font-body font-semibold px-3 sm:px-4 py-2.5 min-h-11 flex items-center gap-1.5 hover:bg-bg2 hover:border-gold hover:text-gold transition-colors"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+            className="shrink-0"
+          >
+            <rect x="6" y="4" width="12" height="16" rx="1.5" stroke="currentColor" strokeWidth="1.8" />
+            <path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" stroke="currentColor" strokeWidth="1.8" />
+            <path d="M9 13.5l2 2 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span className="hidden sm:inline">Track order</span>
+        </Link>
+
         <Link
           href="/order"
-          className="rounded-pill border border-line text-cream text-sm font-body font-semibold px-4 py-2.5 min-h-11 flex items-center hover:bg-red hover:border-red hover:text-white transition-colors"
+          className="rounded-pill border border-line text-cream text-sm font-body font-semibold px-3 sm:px-4 py-2.5 min-h-11 flex items-center hover:bg-red hover:border-red hover:text-white transition-colors"
         >
           Order now
         </Link>

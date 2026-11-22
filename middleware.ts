@@ -50,8 +50,14 @@ export async function middleware(request: NextRequest) {
   const { data } = await supabase.auth.getUser();
   const isAdminPath = request.nextUrl.pathname.startsWith("/admin");
   const isLoginPath = request.nextUrl.pathname.startsWith("/admin/login");
+  // Password recovery has to work for a signed-out (or locked-out) visitor,
+  // so these two are public even though they live under /admin.
+  const isPublicAdminPath =
+    isLoginPath ||
+    request.nextUrl.pathname.startsWith("/admin/forgot-password") ||
+    request.nextUrl.pathname.startsWith("/admin/reset-password");
 
-  if (isAdminPath && !isLoginPath && !data.user) {
+  if (isAdminPath && !isPublicAdminPath && !data.user) {
     const loginUrl = new URL("/admin/login", request.url);
     loginUrl.searchParams.set("next", request.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);

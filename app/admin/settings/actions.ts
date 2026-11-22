@@ -49,12 +49,6 @@ function numberOrZero(value: FormDataEntryValue | null): number {
   return Number.isFinite(n) ? n : 0;
 }
 
-function nullableNumber(value: FormDataEntryValue | null): number | null {
-  if (typeof value !== "string" || value.trim() === "") return null;
-  const n = Number(value);
-  return Number.isFinite(n) ? n : null;
-}
-
 function stringOrEmpty(value: FormDataEntryValue | null): string {
   return typeof value === "string" ? value.trim() : "";
 }
@@ -76,8 +70,6 @@ export async function updateSettingsAction(
     delivery_max_km: numberOrZero(formData.get("deliveryMaxKm")),
     min_order_amount: numberOrZero(formData.get("minOrderAmount")),
     pickup_address: stringOrEmpty(formData.get("pickupAddress")),
-    pickup_lat: nullableNumber(formData.get("pickupLat")),
-    pickup_lng: nullableNumber(formData.get("pickupLng")),
     store_phone: stringOrEmpty(formData.get("storePhone")),
     store_messenger_url: stringOrEmpty(formData.get("storeMessengerUrl")),
     qr_account_name: stringOrEmpty(formData.get("qrAccountName")),

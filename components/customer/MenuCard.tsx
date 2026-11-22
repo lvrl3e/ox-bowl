@@ -67,10 +67,21 @@ export default function MenuCard({ item }: MenuCardProps) {
   return (
     <div
       className={clsx(
-        "bg-bg2 rounded-card border-t-[5px] border-red overflow-hidden flex flex-col transition-shadow hover:shadow-[0_0_0_1px_rgba(245,197,24,0.4),0_8px_20px_rgba(0,0,0,0.35)]",
+        "relative bg-bg2 bg-grill-lines rounded-card border-t-[5px] border-red overflow-hidden flex flex-col shadow-[0_4px_14px_rgba(0,0,0,0.3)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(245,197,24,0.4),0_10px_24px_rgba(0,0,0,0.4)]",
         item.is_sold_out && "opacity-50"
       )}
     >
+      {!item.image_url && (
+        <Image
+          src="/icon-mark-256.png"
+          alt=""
+          aria-hidden="true"
+          width={300}
+          height={256}
+          className="pointer-events-none absolute -right-6 -bottom-6 h-28 w-auto opacity-[0.07]"
+        />
+      )}
+
       {item.image_url && (
         <div className="h-[100px] sm:h-[150px] relative">
           <Image
@@ -93,7 +104,7 @@ export default function MenuCard({ item }: MenuCardProps) {
         </div>
       )}
 
-      <div className="p-2.5 sm:p-4 flex flex-col gap-1.5 sm:gap-2 flex-1">
+      <div className="relative z-10 p-2.5 sm:p-4 flex flex-col gap-1.5 sm:gap-2 flex-1">
         <h3 className="font-heading normal-case text-cream text-sm sm:text-[21px] leading-tight flex flex-wrap items-center gap-1.5 sm:gap-2">
           {item.name}
           {!item.image_url && item.is_new && !item.is_sold_out && (

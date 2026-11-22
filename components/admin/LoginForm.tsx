@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
+import Link from "next/link";
 import { loginAction, type LoginActionState } from "@/app/admin/login/actions";
 
 const initialState: LoginActionState = { error: null };
@@ -10,6 +11,7 @@ export default function LoginForm({ next }: { next: string }) {
     loginAction,
     initialState
   );
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <form action={formAction} className="w-full space-y-4">
@@ -91,13 +93,73 @@ export default function LoginForm({ next }: { next: string }) {
           <input
             id="password"
             name="password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             autoComplete="current-password"
             required
             placeholder="••••••••"
-            className="w-full rounded-btn border border-line bg-bg text-cream font-body pl-10 pr-3 py-2.5 min-h-11 placeholder:text-muted/60 focus:outline-none focus:border-gold transition-colors"
+            className="w-full rounded-btn border border-line bg-bg text-cream font-body pl-10 pr-10 py-2.5 min-h-11 placeholder:text-muted/60 focus:outline-none focus:border-gold transition-colors"
           />
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-pressed={showPassword}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-cream transition-colors"
+          >
+            {showPassword ? (
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3 3l18 18"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M10.6 5.2A10.7 10.7 0 0 1 12 5c5 0 9 4.5 10 7-0.4 1-1.3 2.4-2.6 3.7M6.7 6.7C4.6 8 3.2 10 2 12c1 2.5 5 7 10 7 1.5 0 2.9-.4 4.1-1"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M9.9 9.9a3 3 0 0 0 4.2 4.2"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ) : (
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinejoin="round"
+                />
+                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
+              </svg>
+            )}
+          </button>
         </div>
+        <Link
+          href="/admin/forgot-password"
+          className="mt-1.5 inline-block text-muted text-xs font-body underline underline-offset-2 hover:text-gold"
+        >
+          Forgot password?
+        </Link>
       </div>
 
       {state.error && (

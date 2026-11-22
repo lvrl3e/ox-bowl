@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import AdminHeader from "@/components/admin/AdminHeader";
+import OrdersTabs from "@/components/admin/OrdersTabs";
 import OrderCard from "@/components/admin/OrderCard";
 import type { AdminRole, OrderItemRow, OrderRow } from "@/lib/types/database";
 
@@ -10,9 +12,16 @@ export const metadata: Metadata = { title: "Orders — Admin" };
 
 type OrderWithItems = OrderRow & { order_items: OrderItemRow[] };
 
-const BOARD_STATUSES = ["received", "preparing", "ready", "completed"] as const;
+const BOARD_STATUSES = ["received", "preparing", "ready"] as const;
 
-export default async function AdminOrdersPage() {
+export default async function AdminOrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q } = await searchParams;
+  const searchTerm = q?.trim() ?? "";
+
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) redirect("/admin/login");
@@ -27,17 +36,26 @@ export default async function AdminOrdersPage() {
     .single<{ role: AdminRole }>();
   if (!adminUser) redirect("/admin/login");
 
-  const { data: orders, error } = await supabase
+  let query = supabase
     .from("orders")
     .select("*, order_items(*)")
+    .in("status", BOARD_STATUSES)
     .order("created_at", { ascending: false });
 
-  const allOrders = (orders as OrderWithItems[] | null) ?? [];
+  if (searchTerm) {
+    // Escape ilike wildcards so a literal "%" or "_" in a search term
+    // doesn't act as a wildcard.
+    const escaped = searchTerm.replace(/[%_]/g, (m) => `\\${m}`);
+    query = query.or(`order_number.ilike.%${escaped}%,customer_mobile.ilike.%${escaped}%`);
+  }
+
+  const { data, error } = await query;
+  const activeOrders = (data as OrderWithItems[] | null) ?? [];
 
   const adminClient = createAdminClient();
   const screenshotUrls: Record<string, string> = {};
   await Promise.all(
-    allOrders
+    activeOrders
       .filter((o) => o.payment_screenshot_path)
       .map(async (o) => {
         const { data } = await adminClient.storage
@@ -47,15 +65,50 @@ export default async function AdminOrdersPage() {
       })
   );
 
-  const cancelled = allOrders.filter((o) => o.status === "cancelled");
-
   return (
     <div className="min-h-screen px-5 py-10 max-w-[1400px] mx-auto">
       <AdminHeader active="/admin/orders" />
-      <h1 className="font-heading text-gold text-2xl mb-6">Orders</h1>
+      <OrdersTabs active="/admin/orders" />
+      <div className="flex items-center justify-between gap-4 flex-wrap mb-6">
+        <h1 className="font-heading text-gold text-2xl">Orders</h1>
+
+        <form method="GET" className="flex items-center gap-2">
+          <input
+            type="text"
+            name="q"
+            defaultValue={searchTerm}
+            placeholder="Search order # or phone"
+            className="bg-bg2 border border-line rounded-btn px-3 py-2 text-cream text-sm font-body placeholder:text-muted w-56"
+          />
+          <button
+            type="submit"
+            className="rounded-btn bg-red text-white font-body font-semibold text-sm px-4 py-2 hover:bg-red-deep"
+          >
+            Search
+          </button>
+          {searchTerm && (
+            <Link
+              href="/admin/orders"
+              className="text-muted text-xs font-body underline underline-offset-2 hover:text-gold"
+            >
+              Clear
+            </Link>
+          )}
+        </form>
+      </div>
 
       {error && (
         <p className="text-red font-body text-sm mb-4">Unable to load orders.</p>
+      )}
+      {searchTerm && (
+        <p className="text-muted text-xs font-body mb-4">
+          Showing Received/Preparing/Ready matching &ldquo;{searchTerm}&rdquo;. Completed
+          and Cancelled orders are searched from{" "}
+          <Link href="/admin/orders/history" className="underline underline-offset-2 hover:text-gold">
+            Order History
+          </Link>
+          .
+        </p>
       )}
 
       <div
@@ -63,7 +116,7 @@ export default async function AdminOrdersPage() {
         style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}
       >
         {BOARD_STATUSES.map((status) => {
-          const columnOrders = allOrders.filter((o) => o.status === status);
+          const columnOrders = activeOrders.filter((o) => o.status === status);
           return (
             <div key={status} className="flex flex-col gap-3">
               <h2 className="font-heading text-cream text-sm uppercase tracking-wide border-b border-line pb-2">
@@ -77,32 +130,14 @@ export default async function AdminOrdersPage() {
                 />
               ))}
               {columnOrders.length === 0 && (
-                <p className="text-muted text-xs font-body">No orders</p>
+                <p className="text-muted text-xs font-body">
+                  {searchTerm ? "No match in this column" : "No orders"}
+                </p>
               )}
             </div>
           );
         })}
       </div>
-
-      {cancelled.length > 0 && (
-        <div className="mt-8">
-          <h2 className="font-heading text-cream text-sm uppercase tracking-wide border-b border-line pb-2 mb-3">
-            Cancelled · {cancelled.length}
-          </h2>
-          <div
-            className="grid gap-3"
-            style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}
-          >
-            {cancelled.map((order) => (
-              <OrderCard
-                key={order.id}
-                order={order}
-                screenshotUrl={screenshotUrls[order.id]}
-              />
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
