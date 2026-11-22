@@ -307,13 +307,16 @@ export default function CheckoutForm({ settings }: CheckoutFormProps) {
             </ToggleButton>
           </div>
           {scheduleType === "scheduled" && (
-            <input
-              required
-              type="datetime-local"
-              value={scheduledTime}
-              onChange={(e) => setScheduledTime(e.target.value)}
-              className={clsx(inputClass, "mt-1")}
-            />
+            <label className="text-muted text-xs font-body mt-1">
+              Choose a date and time
+              <input
+                required
+                type="datetime-local"
+                value={scheduledTime}
+                onChange={(e) => setScheduledTime(e.target.value)}
+                className={clsx(inputClass, "mt-1")}
+              />
+            </label>
           )}
         </fieldset>
 
