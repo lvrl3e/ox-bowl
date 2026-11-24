@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getMenu } from "@/lib/data/menu";
 import AdminHeader from "@/components/admin/AdminHeader";
 import MenuItemRow from "@/components/admin/MenuItemRow";
+import AddMenuItemForm from "@/components/admin/AddMenuItemForm";
 import type { AdminRole } from "@/lib/types/database";
 
 export const metadata: Metadata = { title: "Menu — Admin" };
@@ -60,6 +61,8 @@ export default async function AdminMenuPage() {
             </section>
           ))}
         </div>
+
+        {isOwner && <AddMenuItemForm categories={categories} />}
       </div>
     </div>
   );

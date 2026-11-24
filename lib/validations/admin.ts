@@ -58,3 +58,30 @@ export const updateMenuItemSchema = z.object({
 });
 
 export type UpdateMenuItemInput = z.infer<typeof updateMenuItemSchema>;
+
+export const addMenuItemSchema = z
+  .object({
+    categoryId: z.string().uuid(),
+    name: z.string().trim().min(1, "Name is required").max(100, "Keep it under 100 characters"),
+    description: z.string().trim().max(500, "Keep it under 500 characters"),
+    hasVariants: z.boolean(),
+    basePrice: priceSchema.nullable(),
+    variantLabels: z.array(
+      z.string().trim().min(1, "Variant name is required").max(40),
+    ),
+    variantPrices: z.array(priceSchema),
+  })
+  .refine((data) => data.hasVariants || data.basePrice !== null, {
+    message: "Enter a price",
+    path: ["basePrice"],
+  })
+  .refine((data) => !data.hasVariants || data.variantLabels.length > 0, {
+    message: "Add at least one size/variant",
+    path: ["variantLabels"],
+  })
+  .refine((data) => data.variantLabels.length === data.variantPrices.length, {
+    message: "Each size/variant needs a price",
+    path: ["variantPrices"],
+  });
+
+export type AddMenuItemInput = z.infer<typeof addMenuItemSchema>;

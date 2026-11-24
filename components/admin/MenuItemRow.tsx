@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useActionState, useRef, useState } from "react";
 import {
   setSoldOutAction,
@@ -96,6 +97,28 @@ export default function MenuItemRow({
           className="flex flex-col gap-3 border-t border-line px-4 py-3"
         >
           <input type="hidden" name="itemId" value={item.id} />
+
+          <label className="text-muted text-xs font-body">
+            Photo
+            <div className="flex items-center gap-3 mt-1">
+              {item.image_url && (
+                <div className="relative w-16 h-16 shrink-0 bg-bg rounded-btn border border-line overflow-hidden">
+                  <Image
+                    src={item.image_url}
+                    alt={item.name}
+                    fill
+                    className="object-contain p-1"
+                  />
+                </div>
+              )}
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                className={inputClass}
+              />
+            </div>
+          </label>
 
           <label className="text-muted text-xs font-body">
             Description
