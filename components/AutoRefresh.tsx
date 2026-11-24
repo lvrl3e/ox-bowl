@@ -4,12 +4,12 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 /**
- * Admin pages are server-rendered per request with no push/realtime
- * channel, so a new order placed by a customer never appears until
- * something re-requests the page. This polls router.refresh() (a
- * server-component re-fetch, not a full page reload) so the live
- * orders board and dashboard counts pick up new/updated orders
- * without the admin having to manually refresh.
+ * These pages are server-rendered per request with no push/realtime
+ * channel, so a change made elsewhere (a new order, a sold-out toggle,
+ * a status update) never shows up until something re-requests the
+ * page. This polls router.refresh() (a server-component re-fetch, not
+ * a full page reload) in the background so the page picks up changes
+ * on its own.
  */
 export default function AutoRefresh({
   intervalMs = 15000,

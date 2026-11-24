@@ -7,7 +7,7 @@ import type { OrderRow } from "@/lib/types/database";
 import { formatPeso } from "@/lib/format";
 import { manilaDayKey, manilaDateBounds } from "@/lib/admin/orders-date";
 import AdminHeader from "@/components/admin/AdminHeader";
-import AutoRefresh from "@/components/admin/AutoRefresh";
+import AutoRefresh from "@/components/AutoRefresh";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard",

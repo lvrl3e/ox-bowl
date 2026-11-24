@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { currentAdminProfile } from "@/lib/admin/profile";
 import AdminHeader from "@/components/admin/AdminHeader";
-import AutoRefresh from "@/components/admin/AutoRefresh";
+import AutoRefresh from "@/components/AutoRefresh";
 import OrdersTabs from "@/components/admin/OrdersTabs";
 import OrderCard from "@/components/admin/OrderCard";
 import type { OrderItemRow, OrderRow } from "@/lib/types/database";

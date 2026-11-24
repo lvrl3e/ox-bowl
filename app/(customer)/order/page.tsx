@@ -3,6 +3,7 @@ import MenuSection from "@/components/customer/MenuSection";
 import SectionDivider from "@/components/customer/SectionDivider";
 import BackToTop from "@/components/customer/BackToTop";
 import Footer from "@/components/customer/Footer";
+import AutoRefresh from "@/components/AutoRefresh";
 import { getMenu } from "@/lib/data/menu";
 import { getSettings } from "@/lib/data/settings";
 
@@ -17,6 +18,7 @@ export default async function OrderPage() {
 
   return (
     <main>
+      <AutoRefresh intervalMs={30000} />
       <section
         className="relative overflow-hidden"
         style={{

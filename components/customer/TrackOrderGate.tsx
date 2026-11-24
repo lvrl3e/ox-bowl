@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { formatPeso } from "@/lib/format";
@@ -44,6 +44,29 @@ export default function TrackOrderGate({ orderNumber }: TrackOrderGateProps) {
 
     setState({ status: "found", order: data as TrackOrderResult });
   }
+
+  // This page has no push/realtime channel, so once unlocked, poll
+  // quietly in the background to pick up status changes (e.g. the
+  // kitchen marking the order "ready") without the customer having to
+  // re-enter their mobile number or manually refresh. A failed poll
+  // is ignored rather than kicking the customer back to the gate —
+  // it just tries again next interval.
+  useEffect(() => {
+    if (state.status !== "found") return;
+
+    const supabase = createClient();
+    const id = setInterval(async () => {
+      const { data, error } = await supabase.rpc("track_order", {
+        p_order_number: orderNumber,
+        p_mobile: mobile,
+      });
+      if (!error && data) {
+        setState({ status: "found", order: data as TrackOrderResult });
+      }
+    }, 15000);
+
+    return () => clearInterval(id);
+  }, [state.status, orderNumber, mobile]);
 
   if (state.status !== "found") {
     return (

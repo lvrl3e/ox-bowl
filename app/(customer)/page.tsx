@@ -4,6 +4,7 @@ import CrowdFavorites from "@/components/customer/CrowdFavorites";
 import SectionDivider from "@/components/customer/SectionDivider";
 import OrderCta from "@/components/customer/OrderCta";
 import Footer from "@/components/customer/Footer";
+import AutoRefresh from "@/components/AutoRefresh";
 import { getSettings, currentDayKey } from "@/lib/data/settings";
 import { getMenu } from "@/lib/data/menu";
 import { formatTime12h } from "@/lib/format";
@@ -39,6 +40,7 @@ export default async function HomePage() {
 
   return (
     <main>
+      <AutoRefresh intervalMs={30000} />
       <Hero todayHoursLabel={todayHoursLabel} />
       <CrowdFavorites items={favorites} />
       <SectionDivider />
