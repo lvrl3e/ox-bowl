@@ -7,6 +7,7 @@ import type { OrderRow } from "@/lib/types/database";
 import { formatPeso } from "@/lib/format";
 import { manilaDayKey, manilaDateBounds } from "@/lib/admin/orders-date";
 import AdminHeader from "@/components/admin/AdminHeader";
+import AutoRefresh from "@/components/admin/AutoRefresh";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard",
@@ -181,6 +182,7 @@ export default async function AdminHomePage() {
   return (
     <div className="min-h-screen">
       <AdminHeader />
+      <AutoRefresh />
 
       <div className="px-5 py-10 max-w-[900px] mx-auto">
         <div

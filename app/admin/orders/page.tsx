@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { currentAdminProfile } from "@/lib/admin/profile";
 import AdminHeader from "@/components/admin/AdminHeader";
+import AutoRefresh from "@/components/admin/AutoRefresh";
 import OrdersTabs from "@/components/admin/OrdersTabs";
 import OrderCard from "@/components/admin/OrderCard";
 import type { OrderItemRow, OrderRow } from "@/lib/types/database";
@@ -69,6 +70,7 @@ export default async function AdminOrdersPage({
   return (
     <div className="min-h-screen">
       <AdminHeader />
+      <AutoRefresh />
       <div className="px-5 py-10 max-w-[1400px] mx-auto">
         <OrdersTabs active="/admin/orders" />
         <div className="flex items-center justify-between gap-4 flex-wrap mb-6">
