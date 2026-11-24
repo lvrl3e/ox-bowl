@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { AdminRole, OrderRow } from "@/lib/types/database";
+import { currentAdminProfile } from "@/lib/admin/profile";
+import type { OrderRow } from "@/lib/types/database";
 import { formatPeso } from "@/lib/format";
 import { manilaDayKey, manilaDateBounds } from "@/lib/admin/orders-date";
 import AdminHeader from "@/components/admin/AdminHeader";
@@ -27,16 +28,10 @@ const STATUS_BADGE: Record<string, string> = {
 
 export default async function AdminHomePage() {
   const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
-
-  if (!userData.user) {
-    redirect("/admin/login");
-  }
-
   const todayBounds = manilaDateBounds(manilaDayKey(new Date()));
 
   const [
-    adminUserResult,
+    adminProfile,
     received,
     preparing,
     ready,
@@ -44,11 +39,7 @@ export default async function AdminHomePage() {
     completedToday,
     recentResult,
   ] = await Promise.all([
-    supabase
-      .from("admin_users")
-      .select("name, role")
-      .eq("id", userData.user.id)
-      .single<{ name: string | null; role: AdminRole }>(),
+    currentAdminProfile(supabase),
     supabase
       .from("orders")
       .select("*", { count: "exact", head: true })
@@ -79,7 +70,7 @@ export default async function AdminHomePage() {
       .limit(5),
   ]);
 
-  const adminUser = adminUserResult.data;
+  if (!adminProfile) redirect("/admin/login");
   const todaySales = (completedToday.data ?? []).reduce(
     (sum, o: { total: number }) => sum + o.total,
     0,
@@ -201,13 +192,11 @@ export default async function AdminHomePage() {
         >
           <div>
             <p className="font-heading text-cream text-xl">
-              Welcome back, {adminUser?.name ?? userData.user.email}
+              Welcome back, {adminProfile.name ?? adminProfile.email}
             </p>
-            {adminUser?.role && (
-              <span className="inline-block mt-2 rounded-pill bg-red/15 text-red text-[11px] font-body font-semibold tracking-wide px-2.5 py-1 uppercase">
-                {adminUser.role}
-              </span>
-            )}
+            <span className="inline-block mt-2 rounded-pill bg-red/15 text-red text-[11px] font-body font-semibold tracking-wide px-2.5 py-1 uppercase">
+              {adminProfile.role}
+            </span>
           </div>
         </div>
 

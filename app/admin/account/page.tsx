@@ -1,28 +1,21 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { currentAdminProfile } from "@/lib/admin/profile";
 import AdminHeader from "@/components/admin/AdminHeader";
 import ChangePasswordForm from "@/components/admin/ChangePasswordForm";
 import { logoutAction } from "@/app/admin/actions";
-import type { AdminRole } from "@/lib/types/database";
 
 export const metadata: Metadata = { title: "My Account — Admin" };
 
 export default async function AdminAccountPage() {
   const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) redirect("/admin/login");
+  const adminProfile = await currentAdminProfile(supabase);
+  if (!adminProfile) redirect("/admin/login");
 
-  const { data: adminUser } = await supabase
-    .from("admin_users")
-    .select("name, role")
-    .eq("id", userData.user.id)
-    .single<{ name: string | null; role: AdminRole }>();
-  if (!adminUser) redirect("/admin/login");
-
-  const displayName = adminUser.name ?? userData.user.email ?? "Admin";
+  const displayName = adminProfile.name ?? adminProfile.email ?? "Admin";
   const initial = displayName.trim().charAt(0).toUpperCase();
-  const isOwner = adminUser.role === "owner";
+  const isOwner = adminProfile.role === "owner";
 
   return (
     <div className="min-h-screen">
@@ -51,7 +44,7 @@ export default async function AdminAccountPage() {
                 isOwner ? "bg-gold/15 text-gold" : "bg-red/15 text-red"
               }`}
             >
-              {adminUser.role}
+              {adminProfile.role}
             </span>
           </div>
         </div>

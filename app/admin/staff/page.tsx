@@ -2,39 +2,31 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { currentAdminProfile } from "@/lib/admin/profile";
 import AdminHeader from "@/components/admin/AdminHeader";
 import StaffForm from "@/components/admin/StaffForm";
 import { removeStaffAction } from "./actions";
-import type { AdminRole, AdminUser } from "@/lib/types/database";
+import type { AdminUser } from "@/lib/types/database";
 
 export const metadata: Metadata = { title: "Staff — Admin" };
 
 export default async function AdminStaffPage() {
   const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) redirect("/admin/login");
 
   // Supabase Auth emails aren't stored in admin_users, so look them up
   // via the service-role admin API and match by id.
   const adminClient = createAdminClient();
 
-  const [adminUserResult, staffRowsResult, authUsersResult] = await Promise.all(
-    [
-      supabase
-        .from("admin_users")
-        .select("role")
-        .eq("id", userData.user.id)
-        .single<{ role: AdminRole }>(),
-      supabase
-        .from("admin_users")
-        .select("*")
-        .order("created_at", { ascending: true }),
-      adminClient.auth.admin.listUsers(),
-    ],
-  );
-  const adminUser = adminUserResult.data;
-  if (!adminUser) redirect("/admin/login");
-  const isOwner = adminUser.role === "owner";
+  const [adminProfile, staffRowsResult, authUsersResult] = await Promise.all([
+    currentAdminProfile(supabase),
+    supabase
+      .from("admin_users")
+      .select("*")
+      .order("created_at", { ascending: true }),
+    adminClient.auth.admin.listUsers(),
+  ]);
+  if (!adminProfile) redirect("/admin/login");
+  const isOwner = adminProfile.role === "owner";
 
   const staff = (staffRowsResult.data as AdminUser[] | null) ?? [];
   const emailById = new Map(
@@ -91,7 +83,7 @@ export default async function AdminStaffPage() {
                     </span>
                   </div>
                 </div>
-                {isOwner && member.id !== userData.user.id && (
+                {isOwner && member.id !== adminProfile.id && (
                   <form action={removeStaffAction} className="shrink-0">
                     <input type="hidden" name="id" value={member.id} />
                     <button

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { currentAdminProfile } from "@/lib/admin/profile";
 import AdminHeader from "@/components/admin/AdminHeader";
 import OrdersTabs from "@/components/admin/OrdersTabs";
 import OrderCard from "@/components/admin/OrderCard";
@@ -16,7 +17,7 @@ import {
   dateLabelFor,
   parsePage,
 } from "@/lib/admin/orders-date";
-import type { AdminRole, OrderItemRow, OrderRow } from "@/lib/types/database";
+import type { OrderItemRow, OrderRow } from "@/lib/types/database";
 
 export const metadata: Metadata = { title: "Order History — Admin" };
 
@@ -40,8 +41,6 @@ export default async function AdminOrdersHistoryPage({
   const selectedCancelledPage = parsePage(cancelledPage);
 
   const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) redirect("/admin/login");
 
   const todayStr = manilaDayKey(new Date());
   const yesterdayStr = manilaDayKey(new Date(Date.now() - 24 * 60 * 60 * 1000));
@@ -105,18 +104,12 @@ export default async function AdminOrdersHistoryPage({
   // it alongside the order queries (instead of before) since RLS already
   // gates those on their own — we just discard the results below if the
   // admin check fails.
-  const [adminUserResult, completedResult, cancelledResult] = await Promise.all(
-    [
-      supabase
-        .from("admin_users")
-        .select("role")
-        .eq("id", userData.user.id)
-        .single<{ role: AdminRole }>(),
-      completedQuery,
-      cancelledQuery,
-    ],
-  );
-  if (!adminUserResult.data) redirect("/admin/login");
+  const [adminProfile, completedResult, cancelledResult] = await Promise.all([
+    currentAdminProfile(supabase),
+    completedQuery,
+    cancelledQuery,
+  ]);
+  if (!adminProfile) redirect("/admin/login");
 
   const error = completedResult.error ?? cancelledResult.error;
   const completedOrders =

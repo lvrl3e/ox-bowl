@@ -1,30 +1,23 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { currentAdminProfile } from "@/lib/admin/profile";
 import { getMenu } from "@/lib/data/menu";
 import AdminHeader from "@/components/admin/AdminHeader";
 import MenuItemRow from "@/components/admin/MenuItemRow";
 import AddMenuItemForm from "@/components/admin/AddMenuItemForm";
-import type { AdminRole } from "@/lib/types/database";
 
 export const metadata: Metadata = { title: "Menu — Admin" };
 
 export default async function AdminMenuPage() {
   const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) redirect("/admin/login");
 
-  const [adminUserResult, { categories }] = await Promise.all([
-    supabase
-      .from("admin_users")
-      .select("role")
-      .eq("id", userData.user.id)
-      .single<{ role: AdminRole }>(),
+  const [adminProfile, { categories }] = await Promise.all([
+    currentAdminProfile(supabase),
     getMenu(),
   ]);
-  const adminUser = adminUserResult.data;
-  if (!adminUser) redirect("/admin/login");
-  const isOwner = adminUser.role === "owner";
+  if (!adminProfile) redirect("/admin/login");
+  const isOwner = adminProfile.role === "owner";
 
   return (
     <div className="min-h-screen">

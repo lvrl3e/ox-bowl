@@ -3,10 +3,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { currentAdminProfile } from "@/lib/admin/profile";
 import AdminHeader from "@/components/admin/AdminHeader";
 import OrdersTabs from "@/components/admin/OrdersTabs";
 import OrderCard from "@/components/admin/OrderCard";
-import type { AdminRole, OrderItemRow, OrderRow } from "@/lib/types/database";
+import type { OrderItemRow, OrderRow } from "@/lib/types/database";
 
 export const metadata: Metadata = { title: "Orders — Admin" };
 
@@ -23,8 +24,6 @@ export default async function AdminOrdersPage({
   const searchTerm = q?.trim() ?? "";
 
   const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) redirect("/admin/login");
 
   let query = supabase
     .from("orders")
@@ -47,15 +46,11 @@ export default async function AdminOrdersPage({
   // it alongside the orders query (instead of before) since RLS already
   // gates the orders query on its own — we just discard the result
   // below if the admin check fails.
-  const [adminUserResult, { data, error }] = await Promise.all([
-    supabase
-      .from("admin_users")
-      .select("role")
-      .eq("id", userData.user.id)
-      .single<{ role: AdminRole }>(),
+  const [adminProfile, { data, error }] = await Promise.all([
+    currentAdminProfile(supabase),
     query,
   ]);
-  if (!adminUserResult.data) redirect("/admin/login");
+  if (!adminProfile) redirect("/admin/login");
   const activeOrders = (data as OrderWithItems[] | null) ?? [];
 
   const adminClient = createAdminClient();
