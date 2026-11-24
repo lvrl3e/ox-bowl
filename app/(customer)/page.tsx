@@ -1,7 +1,6 @@
 import Hero from "@/components/customer/Hero";
 import HowItWorks from "@/components/customer/HowItWorks";
 import CrowdFavorites from "@/components/customer/CrowdFavorites";
-import Reviews from "@/components/customer/Reviews";
 import SectionDivider from "@/components/customer/SectionDivider";
 import OrderCta from "@/components/customer/OrderCta";
 import Footer from "@/components/customer/Footer";
@@ -42,8 +41,6 @@ export default async function HomePage() {
     <main>
       <Hero todayHoursLabel={todayHoursLabel} />
       <CrowdFavorites items={favorites} />
-      <SectionDivider />
-      <Reviews />
       <SectionDivider />
       <HowItWorks />
       <SectionDivider />
