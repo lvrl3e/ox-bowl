@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { changePasswordAction, type ChangePasswordState } from "@/app/admin/account/actions";
+import PasswordInput from "@/components/admin/PasswordInput";
 
 const initialState: ChangePasswordState = { error: null, success: false };
 
@@ -28,9 +29,8 @@ export default function ChangePasswordForm() {
 
       <label className="text-muted text-xs font-body">
         New password
-        <input
+        <PasswordInput
           name="password"
-          type="password"
           required
           minLength={8}
           placeholder="At least 8 characters"
@@ -39,9 +39,8 @@ export default function ChangePasswordForm() {
       </label>
       <label className="text-muted text-xs font-body">
         Confirm new password
-        <input
+        <PasswordInput
           name="confirmPassword"
-          type="password"
           required
           minLength={8}
           className={inputClass}

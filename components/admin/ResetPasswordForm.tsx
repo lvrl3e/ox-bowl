@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import PasswordInput from "@/components/admin/PasswordInput";
 
 export default function ResetPasswordForm() {
   const [ready, setReady] = useState(false);
@@ -70,8 +71,7 @@ export default function ResetPasswordForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      <input
-        type="password"
+      <PasswordInput
         required
         minLength={8}
         value={password}
@@ -79,8 +79,7 @@ export default function ResetPasswordForm() {
         placeholder="New password"
         className="w-full rounded-btn border border-line bg-bg text-cream font-body px-3 py-2.5 min-h-11 placeholder:text-muted/60 focus:outline-none focus:border-gold transition-colors"
       />
-      <input
-        type="password"
+      <PasswordInput
         required
         minLength={8}
         value={confirmPassword}
