@@ -32,7 +32,6 @@ export const metadata: Metadata = {
       "Crispy sa unang kagat, sulit hanggang huling subo! Pickup and delivery only.",
     url: siteUrl,
     siteName: "Ox Bowl Resto & Grill",
-    images: ["/og-image.jpg"],
     locale: "en_PH",
     type: "website",
   },
