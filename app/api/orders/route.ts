@@ -2,7 +2,15 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { checkoutSchema } from "@/lib/validations/checkout";
 import { isStoreOpenNow } from "@/lib/data/settings";
+import { sendTelegramMessage, escapeHtml } from "@/lib/telegram";
+import { formatPeso } from "@/lib/format";
 import type { Settings } from "@/lib/types/database";
+
+const SCHEDULED_TIME_FORMATTER = new Intl.DateTimeFormat("en-PH", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "Asia/Manila",
+});
 
 interface MenuItemForPricing {
   id: string;
@@ -195,6 +203,50 @@ export async function POST(request: Request) {
   if (itemsError) {
     await supabase.from("orders").delete().eq("id", orderRow.id);
     return errorResponse("Unable to place order", 500);
+  }
+
+  if (settings.notify_telegram_chat_id) {
+    const fulfillmentLine =
+      input.fulfillmentType === "delivery"
+        ? `🚚 Delivery — ${escapeHtml(input.deliveryAddress ?? "")}${
+            input.deliveryLandmark
+              ? ` (${escapeHtml(input.deliveryLandmark)})`
+              : ""
+          }`
+        : "🏃 Pickup";
+    const scheduleLine =
+      input.scheduleType === "scheduled" && input.scheduledTime
+        ? `🕑 Scheduled for ${SCHEDULED_TIME_FORMATTER.format(new Date(input.scheduledTime))}`
+        : "⚡ ASAP";
+    const itemLines = lineItems
+      .map(
+        (l) =>
+          `• ${l.quantity}x ${escapeHtml(l.item_name)}${
+            l.variant_label ? ` (${escapeHtml(l.variant_label)})` : ""
+          } — ${formatPeso(l.line_total)}`,
+      )
+      .join("\n");
+    const paymentLine =
+      input.paymentMethod === "qr"
+        ? "💳 GCash — awaiting verification"
+        : "💵 Cash";
+
+    const message = [
+      `🔔 <b>New order ${escapeHtml(orderRow.order_number)}</b>`,
+      "",
+      fulfillmentLine,
+      scheduleLine,
+      `👤 ${escapeHtml(input.customerName)} — ${escapeHtml(input.customerMobile)}`,
+      "",
+      "<b>Items:</b>",
+      itemLines,
+      "",
+      `💰 Total: ${formatPeso(total)}`,
+      paymentLine,
+      ...(input.notes ? [`📝 ${escapeHtml(input.notes)}`] : []),
+    ].join("\n");
+
+    await sendTelegramMessage(settings.notify_telegram_chat_id, message);
   }
 
   return NextResponse.json({ orderNumber: orderRow.order_number });
