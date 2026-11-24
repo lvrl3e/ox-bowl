@@ -3,7 +3,7 @@
 Mobile-first pickup & delivery ordering site for Ox Bowl Resto & Grill.
 Next.js (App Router) + TypeScript + Tailwind CSS v4, Supabase
 (Postgres/Auth/Storage), deployed on Vercel. No dine-in. Payment is
-manual GCash QR + screenshot, verified by staff in the admin dashboard —
+manual QR + screenshot, verified by staff in the admin dashboard —
 there is no payment gateway wired in (see `COSTS.md` for what that
 would add if you automate it later).
 
@@ -50,6 +50,39 @@ first owner account from scratch (e.g. a fresh Supabase project), create
 a user in Supabase Authentication → Users, then insert a matching row
 into `admin_users` with `role = 'owner'` via the SQL editor.
 
+## Owner notifications (Telegram)
+
+New orders ping a Telegram chat automatically via a bot (`@oxbowl_bot`).
+This is already set up and working — here's how to change who it
+alerts, or set it up again from scratch on a new project.
+
+**To change which chat gets alerts:**
+1. From the Telegram account that should receive alerts, search for
+   `@oxbowl_bot` and send it any message (e.g. "hi"). Telegram only
+   reveals a chat id for accounts that have messaged the bot at least
+   once.
+2. Visit `https://api.telegram.org/bot<TOKEN>/getUpdates` in a browser
+   (get `<TOKEN>` from the `TELEGRAM_BOT_TOKEN` Vercel env var) — the
+   `chat.id` in the response is that account's chat id. **Treat this
+   URL as a secret** — it contains the bot token, so don't share it or
+   its output.
+3. Paste that chat id into Admin → Settings → "Telegram chat id for
+   new-order alerts" and save. No redeploy needed — it's read fresh
+   from the database on every order.
+
+**To set up a brand-new bot** (e.g. a fresh Supabase/Vercel project):
+1. Message `@BotFather` on Telegram, send `/newbot`, and follow the
+   prompts to get a bot token.
+2. Add it as the `TELEGRAM_BOT_TOKEN` env var in Vercel (Project
+   Settings → Environment Variables) and redeploy.
+3. Follow the "change which chat gets alerts" steps above to get a
+   chat id and save it in Settings.
+
+If `TELEGRAM_BOT_TOKEN` or the settings chat id aren't set, order
+placement still works normally — the notification step just no-ops
+silently (see `sendTelegramMessage` in `lib/telegram.ts`, called from
+`app/api/orders/route.ts`).
+
 ## What's built
 
 - **Customer site:** homepage with crowd favorites, full menu by
@@ -62,14 +95,12 @@ into `admin_users` with `role = 'owner'` via the SQL editor.
   review for GCash orders, menu manager (edit prices/descriptions, add
   new items, toggle sold-out), staff account management, store settings
   (hours, delivery fee, pickup address, QR payment details), per-admin
-  password management.
+  password management, Telegram alerts to the owner on every new order
+  (see "Owner notifications" above).
 - **Not implemented:** a payment gateway (PayMongo etc. — currently
-  manual GCash verification by design), automated Telegram/SMS/email
-  order notifications (there's a settings field for a Telegram chat ID
-  but nothing currently sends to it — it's a placeholder for later),
-  analytics (Google Analytics / Meta Pixel env vars exist as
-  placeholders but aren't wired into any page yet), distance-based
-  delivery pricing (currently a flat fee).
+  manual GCash verification by design), analytics (Google Analytics /
+  Meta Pixel env vars exist as placeholders but aren't wired into any
+  page yet), distance-based delivery pricing (currently a flat fee).
 
 ## Tech stack
 
@@ -112,7 +143,7 @@ Copy `.env.local.example` to `.env.local` and fill in:
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Same page | Public, RLS-protected |
 | `SUPABASE_SERVICE_ROLE_KEY` | Same page | **Secret.** Server-only — used for order creation, screenshot uploads, admin signed URLs. Never expose to the client. |
 | `NEXT_PUBLIC_SITE_URL` | Your deployed domain | Used for metadata/OG/sitemap |
-| `TELEGRAM_BOT_TOKEN` | Message `@BotFather` on Telegram | Placeholder only — not currently used by any code (see "What's built") |
+| `TELEGRAM_BOT_TOKEN` | Message `@BotFather` on Telegram | Used to send new-order alerts — see "Owner notifications" above |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` / `NEXT_PUBLIC_FB_PIXEL_ID` | Google Analytics / Meta Events Manager | Placeholder only — not currently used by any code |
 
 All of these also need to be set in Vercel (Project Settings →
