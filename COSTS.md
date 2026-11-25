@@ -9,15 +9,14 @@ costs. Update this whenever a new third-party service gets wired in.
 |---|---|---|
 | **Supabase** | Database, Auth, Storage, Realtime | Free tier works now. Pro ($25/mo) needed once live, mainly because free-tier projects **auto-pause after ~1 week of inactivity** |
 | **Vercel** (hosting) | Deploying the Next.js app | Free "Hobby" tier works technically, but Vercel's terms restrict Hobby to non-commercial use — a for-profit restaurant site is supposed to be on Pro ($20/mo per member) |
-| Google Maps links | "Visit/Pickup" address link | Free — just a `maps.google.com` URL, no billed API key involved |
 | **Custom domain** (`oxbowl.com`) | Registered at Namecheap, pointed at Vercel via DNS | ~$10–20/year, renews annually through Namecheap |
+| **Telegram order alerts** | New-order notifications to the owner/staff (Bot API) | Free, no cost ever |
 
 ## Not integrated (so no cost yet), but worth knowing about
 
 | Thing | Status | If you add it later |
 |---|---|---|
 | **Payment gateway** | None — payments are manual GCash QR + screenshot upload, verified by you in the admin panel | A gateway like PayMongo charges **per-transaction fees** (roughly 3.5% + ₱15 per successful payment, varies by method) — only kicks in if you decide to automate payments instead of manual verification |
-| **Telegram order alerts** | There's a settings field for a chat ID, but no code actually sends anything yet — it's a placeholder, not a working feature | Free either way (Telegram's Bot API has no cost) once someone builds the actual notification call |
 | **Google Analytics / Meta Pixel** | Env var placeholders exist but aren't wired into any page | Free either way — just unfinished |
 | Distance-based delivery fee | Not implemented — delivery currently charges a flat fee regardless of distance | No paid API needed even if you build this later (can be done with free math, no Google Distance Matrix billing required) |
 
@@ -33,4 +32,4 @@ customers, budget roughly:
 
 Nothing charges per-order unless you later add a payment gateway.
 
-*Last updated: 2026-11-25.*
+*Last updated: 2026-11-26.*
