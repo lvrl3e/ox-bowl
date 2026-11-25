@@ -17,7 +17,6 @@ costs. Update this whenever a new third-party service gets wired in.
 | Thing | Status | If you add it later |
 |---|---|---|
 | **Payment gateway** | None — payments are manual GCash QR + screenshot upload, verified by you in the admin panel | A gateway like PayMongo charges **per-transaction fees** (roughly 3.5% + ₱15 per successful payment, varies by method) — only kicks in if you decide to automate payments instead of manual verification |
-| **Google Analytics / Meta Pixel** | Env var placeholders exist but aren't wired into any page | Free either way — just unfinished |
 
 ## Bottom line
 
