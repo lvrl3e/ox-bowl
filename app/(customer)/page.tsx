@@ -40,7 +40,7 @@ export default async function HomePage() {
 
   return (
     <main>
-      <AutoRefresh intervalMs={30000} />
+      <AutoRefresh intervalMs={10000} />
       <Hero todayHoursLabel={todayHoursLabel} />
       <CrowdFavorites items={favorites} />
       <SectionDivider />

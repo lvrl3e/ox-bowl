@@ -18,7 +18,7 @@ export default async function OrderPage() {
 
   return (
     <main>
-      <AutoRefresh intervalMs={30000} />
+      <AutoRefresh intervalMs={10000} />
       <section
         className="relative overflow-hidden"
         style={{
