@@ -1,6 +1,5 @@
 import Header from "@/components/customer/Header";
 import CartDrawer from "@/components/customer/CartDrawer";
-import Analytics from "@/components/Analytics";
 import { getSettings } from "@/lib/data/settings";
 
 export default async function CustomerLayout({
@@ -12,7 +11,6 @@ export default async function CustomerLayout({
 
   return (
     <>
-      <Analytics />
       <Header />
       {children}
       <CartDrawer minOrderAmount={settings.min_order_amount} />
